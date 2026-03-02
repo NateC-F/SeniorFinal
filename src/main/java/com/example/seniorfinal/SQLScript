@@ -1,0 +1,97 @@
+-- ============================
+--		MARKET PLACE
+-- ============================
+
+DROP DATABASE IF EXISTS MarketPlace;
+
+CREATE DATABASE MarketPlace;
+USE MarketPlace;
+
+-- =================================================================================
+CREATE TABLE user_profile
+(
+	user_id			INT 		PRIMARY KEY		AUTO_INCREMENT,
+    user_name		VARCHAR(20)					NOT NULL,
+    user_pass		VARCHAR(255)				NOT NULL
+
+)AUTO_INCREMENT = 1;
+-- =================================================================================
+CREATE TABLE listing
+(
+	listing_id			INT 		PRIMARY KEY		AUTO_INCREMENT,
+    listing_name		VARCHAR(50)					NOT NULL,
+    -- listing_picture		BLOB, This will store the whole picture on DB takes a lot of storage
+    -- listing_picture VARCHAR(255), This will store the file path of the picture less storage, but will break if file is moved
+    listing_description VARCHAR(250)				NOT NULL,
+    listing_active		BOOL,
+    listing_start		TIMESTAMP	DEFAULT CURRENT_TIMESTAMP,
+    listing_end			TIMESTAMP	DEFAULT (CURRENT_TIMESTAMP + INTERVAL 7 DAY),
+    listing_price		int			NOT NULL,
+    user_id				INT			NOT NULL,
+
+    constraint listing_userid_foreignkey FOREIGN KEY (user_id) references user_profile (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+)AUTO_INCREMENT = 1;
+-- =================================================================================
+CREATE TABLE item_category
+(
+	category_id			INT 		PRIMARY KEY		AUTO_INCREMENT,
+    category_name		VARCHAR(20)					NOT NULL
+)AUTO_INCREMENT = 1;
+-- =================================================================================
+CREATE TABLE listing_category
+(
+	listing_id			INT,
+    category_id			INT,
+    constraint listing_category_primarykey PRIMARY KEY (listing_id,category_id),
+    constraint listing_category_listingid_foreignkey FOREIGN KEY (listing_id) references listing (listing_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    constraint listing_category_categoryid_foreignkey FOREIGN KEY (category_id) references item_category (category_id) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+-- =================================================================================
+
+
+
+
+-- ============================
+--		 TABLE INSERTS
+-- ============================
+
+INSERT INTO user_profile (user_name, user_pass) VALUES
+('Alice', 'password123'),
+('Bob', 'secret456'),
+('Charlie', 'hunter2');
+
+INSERT INTO item_category (category_name) VALUES
+('Electronics'),
+('Books'),
+('Clothing'),
+('Toys');
+
+INSERT INTO listing (listing_name, listing_description, listing_active, user_id, listing_price) VALUES
+('iPhone 14', 'Brand new iPhone 14, unopened box', TRUE, 1, 999),
+('Harry Potter Box Set', 'Complete 7-book set in excellent condition', TRUE, 2, 120),
+('Men\'s Jacket', 'Winter jacket, size L', TRUE, 3, 60),
+('LEGO Star Wars', '5000-piece LEGO set', FALSE, 1, 450);
+
+INSERT INTO listing_category (listing_id, category_id) VALUES
+(1, 1),  -- iPhone 14 → Electronics
+(2, 2),  -- Harry Potter → Books
+(3, 3),  -- Men’s Jacket → Clothing
+(4, 4);  -- LEGO → Toys
+
+
+SELECT l.listing_id, l.listing_name, l.listing_price, u.user_name, c.category_name, l.listing_start, l.listing_end
+FROM listing l
+JOIN user_profile u ON l.user_id = u.user_id
+JOIN listing_category lc ON l.listing_id = lc.listing_id
+JOIN item_category c ON lc.category_id = c.category_id;
+
+
+
+
+
+
+
+
+
