@@ -1,4 +1,4 @@
-package com.example.seniorfinal;
+package com.example.seniorfinal.Utilities;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

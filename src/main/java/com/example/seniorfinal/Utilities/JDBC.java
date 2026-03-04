@@ -1,4 +1,4 @@
-package com.example.seniorfinal;
+package com.example.seniorfinal.Utilities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

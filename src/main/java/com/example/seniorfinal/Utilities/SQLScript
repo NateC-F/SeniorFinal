@@ -1,0 +1,380 @@
+-- ============================
+--        MARKET PLACE
+-- ============================
+
+DROP DATABASE IF EXISTS MarketPlace;
+
+CREATE DATABASE MarketPlace;
+USE MarketPlace;
+
+-- =================================================================================
+CREATE TABLE user_profile
+(
+    user_id            INT         PRIMARY KEY     	 AUTO_INCREMENT,
+    user_name          VARCHAR(20)	UNIQUE        	 NOT NULL,
+    user_pass          VARCHAR(255)                  NOT NULL
+) AUTO_INCREMENT = 1;
+
+-- =================================================================================
+CREATE TABLE listing
+(
+    listing_id             INT         PRIMARY KEY     AUTO_INCREMENT,
+    listing_name           VARCHAR(50)                 NOT NULL,
+    -- listing_picture     BLOB, This will store the whole picture on DB takes a lot of storage
+    -- listing_picture     VARCHAR(255), This will store the file path of the picture less storage, but will break if file is moved
+    listing_description    VARCHAR(250)                NOT NULL,
+    listing_active         BOOL                        DEFAULT TRUE,
+    listing_start          TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+    listing_end            TIMESTAMP,
+    listing_price          INT                         NOT NULL,
+    listing_longitude	   DECIMAL(9,6)				   NOT NULL,
+    listing_latitude	   DECIMAL(9,6)				   NOT NULL,
+    listing_town     	   VARCHAR(50)				   NOT NULL,
+    listing_state		   VARCHAR(2)				   NOT NULL,
+    listing_quantity	   int						   NOT NULL,
+    user_id                INT                         NOT NULL,
+
+    CONSTRAINT listing_userid_foreignkey
+        FOREIGN KEY (user_id)
+        REFERENCES user_profile (user_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+
+	CONSTRAINT listing_state_valid
+		CHECK (listing_state IN (
+			'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+			'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+			'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+			'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+			'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'))
+) AUTO_INCREMENT = 1;
+
+-- =================================================================================
+CREATE TABLE item_category
+(
+    category_id        INT         PRIMARY KEY     AUTO_INCREMENT,
+    category_name      VARCHAR(20)                 NOT NULL
+) AUTO_INCREMENT = 1;
+
+-- =================================================================================
+CREATE TABLE listing_category
+(
+    listing_id         INT,
+    category_id        INT,
+
+    CONSTRAINT listing_category_primarykey
+        PRIMARY KEY (listing_id, category_id),
+
+    CONSTRAINT listing_category_listingid_foreignkey
+        FOREIGN KEY (listing_id)
+        REFERENCES listing (listing_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT listing_category_categoryid_foreignkey
+        FOREIGN KEY (category_id)
+        REFERENCES item_category (category_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- ============================
+--       ORDER HISTORY
+-- ============================
+
+CREATE TABLE order_history
+(
+    order_id        INT    PRIMARY KEY 		AUTO_INCREMENT,
+    listing_id      INT        	 			NOT NULL,
+    buyer_id  		INT         			NOT NULL,
+    seller_id 		INT         			NOT NULL,
+    purchase_price  INT   					NOT NULL,
+    purchase_quantity INT       			DEFAULT 1,
+    purchase_date   TIMESTAMP   			DEFAULT CURRENT_TIMESTAMP,
+    order_status    VARCHAR(20)	 			DEFAULT 'Completed',
+
+    CONSTRAINT order_listing_fk
+        FOREIGN KEY (listing_id)
+        REFERENCES listing(listing_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT order_buyer_fk
+        FOREIGN KEY (buyer_id)
+        REFERENCES user_profile(user_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+
+    CONSTRAINT order_seller_fk
+        FOREIGN KEY (seller_id)
+        REFERENCES user_profile(user_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- =================================================================================
+CREATE TABLE listing_archive LIKE listing;  -- Does as name suggests, it will archive old listings
+-- =================================================================================
+
+-- ============================
+--         TABLE EVENTS
+-- ============================
+
+-- DEACTIVATE EXPIRED LISTINGS
+DELIMITER //
+CREATE EVENT deactivate_expired_listings
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+    UPDATE listing
+    SET listing_active = FALSE
+    WHERE listing_active = TRUE
+      AND listing_end < NOW();
+END //
+DELIMITER ;
+
+-- DELETES AND ARCHIVES OLD LISTINGS
+DELIMITER //
+CREATE EVENT delete_old_listings
+ON SCHEDULE EVERY 1 DAY
+STARTS CURRENT_TIMESTAMP
+DO
+BEGIN
+	INSERT INTO listing_archive
+	SELECT * FROM listing
+	WHERE listing_end < (NOW() - INTERVAL 1 MONTH);
+	DELETE FROM listing
+	WHERE listing_end < (NOW() - INTERVAL 1 MONTH);
+END //
+DELIMITER ;
+
+-- ============================
+--         TABLE TRIGGERS
+-- ============================
+
+-- PREVENT NEGATIVE PRICES
+DELIMITER //
+CREATE TRIGGER prevent_negative_price
+BEFORE INSERT ON listing
+FOR EACH ROW
+BEGIN
+    IF NEW.listing_price < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Price Cannot Be Negative';
+    END IF;
+END //
+DELIMITER ;
+
+
+-- ============================
+--         TABLE PROCEDURES
+-- ============================
+
+-- Create Listing
+DELIMITER //
+CREATE PROCEDURE create_listing(IN listing_input_name VARCHAR(50), IN listing_input_description VARCHAR(250), IN listing_input_userID INT, IN listing_input_price INT, IN listing_input_endTime TIMESTAMP,
+								IN listing_input_state VARCHAR(2), IN listing_input_town VARCHAR(50), IN listing_input_longitude DECIMAL(9,6), IN listing_input_latitude DECIMAL(9,6), IN listing_input_quantity INT,
+                                IN listing_input_categoryID INT)
+BEGIN
+	IF (listing_input_endTime IS NULL) THEN
+        SET listing_input_endTime = (CURRENT_TIMESTAMP + INTERVAL 7 DAY);
+	END IF;
+
+	INSERT INTO listing(listing_name, listing_description, user_id, listing_price, listing_end, listing_state, listing_town, listing_longitude, listing_latitude, listing_quantity)
+    VALUES (listing_input_name, listing_input_description, listing_input_userID, listing_input_price, listing_input_endTime,
+		   listing_input_state, listing_input_town, listing_input_longitude, listing_input_latitude, listing_input_quantity);
+
+	INSERT INTO listing_category(listing_id, category_id)
+    VALUES (LAST_INSERT_ID(),listing_input_categoryID);
+
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE buy_listing(IN listing_input_id INT, IN listing_buyer_id INT, IN purchase_amount INT)
+BEGIN
+	DECLARE seller_variable_id INT;
+    DECLARE selling_price INT;
+
+    SELECT user_id, listing_price
+    INTO seller_variable_id, selling_price
+    FROM listing
+    WHERE listing_id = listing_input_id;
+
+    INSERT INTO order_history(listing_id, buyer_id, seller_id, purchase_price, purchase_quantity)
+    VALUES (listing_input_id, listing_buyer_id, seller_variable_id, selling_price, purchase_amount);
+
+    UPDATE listing
+    SET listing_active = FALSE
+    WHERE listing_id = listing_input_id;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE delete_listing(IN p_listing_id INT)
+BEGIN
+    DELETE FROM listing
+    WHERE listing_id = p_listing_id;
+END //
+DELIMITER ;
+
+-- ============================
+--         TABLE INDEXES
+-- ============================
+
+
+
+-- ============================
+--         TABLE INSERTS		***EVERYTHING BEYOND THIS POINT WAS GENERATED WITH AI FOR TEST PURPOSES ONLY*****
+-- ============================
+
+
+-- ============================
+--         USERS
+-- ============================
+INSERT INTO user_profile (user_name, user_pass) VALUES
+('Alice', 'password123'),
+('Bob', 'secret456'),
+('Charlie', 'hunter2'),
+('Diana', 'qwerty789');
+
+-- ============================
+--         ITEM CATEGORIES
+-- ============================
+INSERT INTO item_category (category_name) VALUES
+('Electronics'),
+('Books'),
+('Clothing'),
+('Toys');
+
+-- ============================
+--         LISTINGS
+-- ============================
+INSERT INTO listing (listing_name, listing_description, listing_active, user_id, listing_price, listing_quantity, listing_state, listing_town, listing_longitude, listing_latitude, listing_end) VALUES
+('iPhone 14', 'Brand new iPhone 14, unopened box', TRUE, 1, 999, 5, 'CA', 'San Francisco', -122.4194, 37.7749, CURRENT_TIMESTAMP + INTERVAL 10 DAY),
+('Harry Potter Box Set', 'Complete 7-book set in excellent condition', TRUE, 2, 120, 2, 'NY', 'New York', -74.0060, 40.7128, CURRENT_TIMESTAMP + INTERVAL 15 DAY),
+('Men\'s Jacket', 'Winter jacket, size L', TRUE, 3, 60, 3, 'IL', 'Chicago', -87.6298, 41.8781, CURRENT_TIMESTAMP + INTERVAL 7 DAY),
+('LEGO Star Wars', '5000-piece LEGO set', FALSE, 1, 450, 1, 'TX', 'Austin', -97.7431, 30.2672, CURRENT_TIMESTAMP - INTERVAL 1 DAY);
+
+-- ============================
+--         LISTING CATEGORIES
+-- ============================
+INSERT INTO listing_category (listing_id, category_id) VALUES
+(1, 1),  -- iPhone 14 : Electronics
+(2, 2),  -- Harry Potter : Books
+(3, 3),  -- Men's Jacket : Clothing
+(4, 4);  -- LEGO : Toys
+
+-- ============================
+--         ORDER HISTORY
+-- ============================
+INSERT INTO order_history (listing_id, buyer_id, seller_id, purchase_price, purchase_quantity, order_status) VALUES
+(4, 2, 1, 450, 1, 'Completed'),   -- Bob bought LEGO from Alice
+(3, 1, 3, 60, 1, 'Completed'),    -- Alice bought Men's Jacket from Charlie
+(2, 3, 2, 120, 1, 'Pending');     -- Charlie ordered Harry Potter Box Set from Bob
+
+
+-- ============================
+--         TEST PROCEDURES
+-- ============================
+
+-- 1️⃣ Test create_listing procedure
+-- Creating new listings using the procedure
+CALL create_listing(
+    'Samsung Galaxy S23',
+    'Brand new Galaxy S23, unopened box',
+    2,              -- Bob is the seller
+    899,            -- price
+    NULL,           -- end time (should default to 7 days)
+    'CA',
+    'Los Angeles',
+    -118.2437,
+    34.0522,
+    3,              -- quantity
+    1               -- category_id = Electronics
+);
+
+CALL create_listing(
+    'The Lord of the Rings Box Set',
+    'Complete 6-book set, great condition',
+    3,              -- Charlie is the seller
+    100,
+    NULL,
+    'NY',
+    'New York',
+    -74.0060,
+    40.7128,
+    2,              -- quantity
+    2               -- category_id = Books
+);
+
+CALL create_listing(
+    'Women\'s Winter Coat',
+    'Size M, lightly used',
+    4,              -- Diana is the seller
+    75,
+    NULL,
+    'IL',
+    'Chicago',
+    -87.6298,
+    41.8781,
+    4,              -- quantity
+    3               -- category_id = Clothing
+);
+
+-- 2️⃣ Test buy_listing procedure
+-- Making purchases using the procedure
+
+-- Alice buys 1 Samsung Galaxy S23 from Bob
+CALL buy_listing(5, 1, 1);
+
+-- Diana buys 2 Women's Winter Coats from Diana (seller = Diana)
+-- Normally, you might prevent self-purchase, but this is just a test
+CALL buy_listing(7, 4, 2);
+
+-- Charlie buys 1 Lord of the Rings Box Set from Charlie
+CALL buy_listing(6, 3, 1);
+
+-- 3️⃣ Verify listings and order history after procedures
+-- View current listings
+SELECT l.listing_id, l.listing_name, l.listing_quantity, l.listing_active, u.user_name AS seller
+FROM listing l
+JOIN user_profile u ON l.user_id = u.user_id;
+
+-- View order history
+SELECT o.order_id, l.listing_name, o.purchase_quantity, o.purchase_price, b.user_name AS buyer, s.user_name AS seller, o.order_status
+FROM order_history o
+JOIN listing l ON o.listing_id = l.listing_id
+JOIN user_profile b ON o.buyer_id = b.user_id
+JOIN user_profile s ON o.seller_id = s.user_id;
+
+
+
+-- ============================
+--         TEST QUERIES
+-- ============================
+-- View listings with category and seller
+SELECT l.listing_id,
+       l.listing_name,
+       l.listing_price,
+       l.listing_quantity,
+       u.user_name AS seller_name,
+       c.category_name,
+       l.listing_start,
+       l.listing_end,
+       l.listing_active
+FROM listing l
+JOIN user_profile u ON l.user_id = u.user_id
+JOIN listing_category lc ON l.listing_id = lc.listing_id
+JOIN item_category c ON lc.category_id = c.category_id;
+
+-- View order history
+SELECT o.order_id,
+       o.purchase_date,
+       l.listing_name,
+       o.purchase_quantity,
+       o.purchase_price,
+       b.user_name AS buyer,
+       s.user_name AS seller,
+       o.order_status
+FROM order_history o
+JOIN listing l ON o.listing_id = l.listing_id
+JOIN user_profile b ON o.buyer_id = b.user_id
+JOIN user_profile s ON o.seller_id = s.user_id;
+
