@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.ListingCreateController">
+   <children>
+      <ComboBox fx:id="categoryBox" layoutX="123.0" layoutY="67.0" prefWidth="150.0" promptText="Pick A Category" />
+      <Text layoutX="112.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="make your listing here" />
+      <ComboBox fx:id="stateBox" layoutX="273.0" layoutY="67.0" prefHeight="25.0" prefWidth="79.0" promptText="States" />
+   </children>
+</AnchorPane>

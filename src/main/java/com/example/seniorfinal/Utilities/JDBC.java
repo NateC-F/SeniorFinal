@@ -10,9 +10,8 @@ public class JDBC
     private static final String user = "root";
     private static String password = "1234";
 
-    public static Connection startConnection() {
+    public static Connection getConnection() {
         try {
-            System.out.println("working");
             return DriverManager.getConnection(url, user,password);
         } catch (SQLException e) {
             e.printStackTrace();

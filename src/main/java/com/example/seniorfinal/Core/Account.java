@@ -1,6 +1,12 @@
 package com.example.seniorfinal.Core;
 
-public class Account
+public interface Account
 {
+    public void setAccountID(int id);
 
+    public void setAccountName(String name);
+
+    public String getAccountName();
+
+    public int getAccountID();
 }

@@ -3,6 +3,7 @@ module com.example.seniorfinal {
     requires javafx.fxml;
     requires mysql.connector.j;
     requires java.sql;
+    requires jbcrypt;
 
 
     opens com.example.seniorfinal to javafx.fxml;

@@ -24,14 +24,37 @@ public class SceneManager
         {
             switch (id)
             {
-//                case POS_SCREEN -> {
-//                    scene = new Scene(loadFXML("pos.fxml"),750,240);
-//                    stage.setTitle("Point Of Sale");
-//                }
-//                case ROOM_SUMMARY -> {
-//                    scene = new Scene(loadFXML("summary.fxml"),resX,resY);
-//                    stage.setTitle("Room Summaries");
-//                }
+                case LoginScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/login.fxml"), resX, resY);
+                    stage.setTitle("Login");
+                }
+                case CreateAccountScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/createAccount.fxml"), resX/2, resY/2);
+                    stage.setTitle("Account Creation");
+                }
+                case MainScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/main.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace Home");
+                }
+                case ListingViewScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/listingView.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace Listing");
+                }  case ListingCreateScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/listingCreate.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace Listing");
+                }
+                case ProfileScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/profile.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace User");
+                }
+                case OrderHistoryScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/orderHistory.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace OrderHistory");
+                }
+                case CheckoutScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/checkout.fxml"), resX, resY);
+                    stage.setTitle("MarketPlace Checkout");
+                }
             }
 
             if(scene != null)
