@@ -15,16 +15,22 @@ public class ListingDAO
 
 //=============================================================================================================
     public void CreateListing(String listingName, String listingDescription, int listingPrice, Date endingDate,
-                              String state, String town, int listingQuantity, int categoryID)
+                              String state, String town, double longitude, double latitude, int listingQuantity, int categoryID)
     {
         sqlCode = "CALL create_listing(?,?,?,?,?,?,?,?,?,?,?)";
 
 //      CREATE PROCEDURE create_listing(
-//      IN listing_input_name VARCHAR(50), IN listing_input_description VARCHAR(250), IN listing_input_userID INT,
-//      IN listing_input_price INT, IN listing_input_endTime DATE,
-//      IN listing_input_state VARCHAR(2), IN listing_input_town VARCHAR(50), IN listing_input_longitude DECIMAL(9,6),
-//      IN listing_input_latitude DECIMAL(9,6), IN listing_input_quantity INT,
-//      IN listing_input_categoryID INT)
+//      1)IN listing_input_name VARCHAR(50),
+//      2)IN listing_input_description VARCHAR(250),
+//      3)IN listing_input_userID INT,
+//      4)IN listing_input_price INT,
+//      5)IN listing_input_endTime DATE,
+//      6)IN listing_input_state VARCHAR(2),
+//      7)IN listing_input_town VARCHAR(50),
+//      8)IN listing_input_longitude DECIMAL(9,6),
+//      9)IN listing_input_latitude DECIMAL(9,6),
+//      10)IN listing_input_quantity INT,
+//      11)IN listing_input_categoryID INT)
 
         try(Connection connection = JDBC.getConnection())
         {
@@ -36,11 +42,11 @@ public class ListingDAO
             statement.setDate(5,endingDate);
             statement.setString(6,state);
             statement.setString(7,town);
-            statement.setDouble(8,12.345678); // these values will change when i have API integration
-            statement.setDouble(9,-123.456780);
+            statement.setDouble(8,longitude);
+            statement.setDouble(9,latitude);
             statement.setInt(10, listingQuantity);
             statement.setInt(11, categoryID);
-
+            statement.executeUpdate();
         }
         catch (Exception e)
         {

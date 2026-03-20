@@ -15,6 +15,7 @@ public class Listing
     private String pickUpLocation;
     private double longitude;
     private double latitude;
+    private String url;
 
     public Listing(String name, String description, Date endTime, int price, String pickUpLocation, double longitude, double latitude)
     {
@@ -29,5 +30,10 @@ public class Listing
         this.longitude = longitude;
         this.latitude = latitude;
 
+    }
+
+    public String getUrl()
+    {
+        return getClass().getResource("/map.html").toExternalForm() + "?latitude=" + latitude + "&longitude=" + longitude;
     }
 }

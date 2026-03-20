@@ -4,6 +4,10 @@ module com.example.seniorfinal {
     requires mysql.connector.j;
     requires java.sql;
     requires jbcrypt;
+    requires com.google.common;
+    requires com.google.protobuf;
+    requires java.net.http;
+    requires org.json;
 
 
     opens com.example.seniorfinal to javafx.fxml;
