@@ -1,13 +1,13 @@
 module com.example.seniorfinal {
-    requires javafx.controls;
     requires javafx.fxml;
     requires mysql.connector.j;
     requires java.sql;
     requires jbcrypt;
     requires com.google.common;
     requires com.google.protobuf;
-    requires java.net.http;
     requires org.json;
+    requires javafx.web;
+    requires java.net.http;
 
 
     opens com.example.seniorfinal to javafx.fxml;

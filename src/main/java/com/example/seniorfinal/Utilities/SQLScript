@@ -22,10 +22,10 @@ CREATE TABLE listing
     listing_name           VARCHAR(50)                 NOT NULL,
     -- listing_picture     BLOB, This will store the whole picture on DB takes a lot of storage
     -- listing_picture     VARCHAR(255), This will store the file path of the picture less storage, but will break if file is moved
-    listing_description    VARCHAR(250)                NOT NULL,
+    listing_description    VARCHAR(1000)                NOT NULL,
     listing_active         BOOL                        DEFAULT TRUE,
-    listing_start          TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-    listing_end            TIMESTAMP,
+	listing_start 		   DATE 					   DEFAULT (CURDATE()),
+    listing_end            DATE,
     listing_price          INT                         NOT NULL,
     listing_longitude	   DECIMAL(9,6)				   NOT NULL,
     listing_latitude	   DECIMAL(9,6)				   NOT NULL,
@@ -55,6 +55,23 @@ CREATE TABLE item_category
     category_id        INT         PRIMARY KEY     AUTO_INCREMENT,
     category_name      VARCHAR(20)                 NOT NULL
 ) AUTO_INCREMENT = 1;
+
+INSERT INTO item_category (category_name) VALUES
+('Electronics'),
+('Furniture'),
+('Clothing'),
+('Books'),
+('Home Appliances'),
+('Sports Equipment'),
+('Video Games'),
+('Automotive'),
+('Toys'),
+('Tools'),
+('Office Supplies'),
+('Garden'),
+('Pet Supplies'),
+('Health & Beauty'),
+('Music Instruments');
 
 -- =================================================================================
 CREATE TABLE listing_category
@@ -88,7 +105,7 @@ CREATE TABLE order_history
     seller_id 		INT         			NOT NULL,
     purchase_price  INT   					NOT NULL,
     purchase_quantity INT       			DEFAULT 1,
-    purchase_date   TIMESTAMP   			DEFAULT CURRENT_TIMESTAMP,
+    purchase_date   DATE   					DEFAULT (CURDATE()),
     order_status    VARCHAR(20)	 			DEFAULT 'Completed',
 
     CONSTRAINT order_listing_fk
@@ -168,12 +185,12 @@ DELIMITER ;
 
 -- Create Listing
 DELIMITER //
-CREATE PROCEDURE create_listing(IN listing_input_name VARCHAR(50), IN listing_input_description VARCHAR(250), IN listing_input_userID INT, IN listing_input_price INT, IN listing_input_endTime TIMESTAMP,
+CREATE PROCEDURE create_listing(IN listing_input_name VARCHAR(50), IN listing_input_description VARCHAR(250), IN listing_input_userID INT, IN listing_input_price INT, IN listing_input_endTime DATE,
 								IN listing_input_state VARCHAR(2), IN listing_input_town VARCHAR(50), IN listing_input_longitude DECIMAL(9,6), IN listing_input_latitude DECIMAL(9,6), IN listing_input_quantity INT,
                                 IN listing_input_categoryID INT)
 BEGIN
 	IF (listing_input_endTime IS NULL) THEN
-        SET listing_input_endTime = (CURRENT_TIMESTAMP + INTERVAL 7 DAY);
+        SET listing_input_endTime = ( (CURDATE()) + INTERVAL 7 DAY);
 	END IF;
 
 	INSERT INTO listing(listing_name, listing_description, user_id, listing_price, listing_end, listing_state, listing_town, listing_longitude, listing_latitude, listing_quantity)
@@ -200,9 +217,15 @@ BEGIN
     INSERT INTO order_history(listing_id, buyer_id, seller_id, purchase_price, purchase_quantity)
     VALUES (listing_input_id, listing_buyer_id, seller_variable_id, selling_price, purchase_amount);
 
-    UPDATE listing
-    SET listing_active = FALSE
-    WHERE listing_id = listing_input_id;
+	UPDATE listing
+	SET
+		listing_quantity = listing_quantity - purchase_quantity,
+		listing_active = CASE
+			WHEN listing_quantity - purchase_quantity <= 0 THEN FALSE
+			ELSE listing_active
+		END
+	WHERE listing_id = listing_input_id;
+
 END //
 DELIMITER ;
 
@@ -217,9 +240,6 @@ DELIMITER ;
 -- ============================
 --         TABLE INDEXES
 -- ============================
-
-
-
 
 
 
@@ -242,18 +262,29 @@ INSERT INTO user_profile (user_name, user_pass) VALUES
 -- ============================
 INSERT INTO item_category (category_name) VALUES
 ('Electronics'),
-('Books'),
+('Furniture'),
 ('Clothing'),
-('Toys');
+('Books'),
+('Home Appliances'),
+('Sports Equipment'),
+('Video Games'),
+('Automotive'),
+('Toys'),
+('Tools'),
+('Office Supplies'),
+('Garden'),
+('Pet Supplies'),
+('Health & Beauty'),
+('Music Instruments');
 
 -- ============================
 --         LISTINGS
 -- ============================
 INSERT INTO listing (listing_name, listing_description, listing_active, user_id, listing_price, listing_quantity, listing_state, listing_town, listing_longitude, listing_latitude, listing_end) VALUES
-('iPhone 14', 'Brand new iPhone 14, unopened box', TRUE, 1, 999, 5, 'CA', 'San Francisco', -122.4194, 37.7749, CURRENT_TIMESTAMP + INTERVAL 10 DAY),
-('Harry Potter Box Set', 'Complete 7-book set in excellent condition', TRUE, 2, 120, 2, 'NY', 'New York', -74.0060, 40.7128, CURRENT_TIMESTAMP + INTERVAL 15 DAY),
-('Men\'s Jacket', 'Winter jacket, size L', TRUE, 3, 60, 3, 'IL', 'Chicago', -87.6298, 41.8781, CURRENT_TIMESTAMP + INTERVAL 7 DAY),
-('LEGO Star Wars', '5000-piece LEGO set', FALSE, 1, 450, 1, 'TX', 'Austin', -97.7431, 30.2672, CURRENT_TIMESTAMP - INTERVAL 1 DAY);
+('iPhone 14', 'Brand new iPhone 14, unopened box', TRUE, 1, 999, 5, 'CA', 'San Francisco', -122.4194, 37.7749, (CURDATE()) + INTERVAL 10 DAY),
+('Harry Potter Box Set', 'Complete 7-book set in excellent condition', TRUE, 2, 120, 2, 'NY', 'New York', -74.0060, 40.7128, (CURDATE()) + INTERVAL 15 DAY),
+('Men\'s Jacket', 'Winter jacket, size L', TRUE, 3, 60, 3, 'IL', 'Chicago', -87.6298, 41.8781, (CURDATE()) + INTERVAL 7 DAY),
+('LEGO Star Wars', '5000-piece LEGO set', FALSE, 1, 450, 1, 'TX', 'Austin', -97.7431, 30.2672, (CURDATE()) - INTERVAL 1 DAY);
 
 -- ============================
 --         LISTING CATEGORIES
@@ -380,4 +411,11 @@ FROM order_history o
 JOIN listing l ON o.listing_id = l.listing_id
 JOIN user_profile b ON o.buyer_id = b.user_id
 JOIN user_profile s ON o.seller_id = s.user_id;
+
+Select *
+From user_profile;
+
+Select *
+From listing
+Where listing_active is true;
 

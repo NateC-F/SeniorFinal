@@ -1,12 +1,15 @@
 package com.example.seniorfinal.Model.DAO;
 
+import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.JDBC;
 
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class ListingDAO
 {
@@ -54,4 +57,77 @@ public class ListingDAO
         }
 
     }
+    //=============================================================================================================
+    public Listing getListing(int listingID)
+    {
+        sqlCode = "Select * From listing Where listing_id is ?";
+        Listing listing = null;
+        try(Connection connection = JDBC.getConnection())
+        {
+            statement = connection.prepareStatement(sqlCode);
+            statement.setString(1,String.valueOf(listingID));
+
+            ResultSet rs = statement.executeQuery();
+
+            int listing_id = rs.getInt("listing_id");
+            String listing_name = rs.getString("listing_name");
+            String listing_description = rs.getString("listing_description");
+            Date start_date = rs.getDate("listing_start");
+            Date end_date = rs.getDate("listing_end");
+            int listing_price = rs.getInt("listing_price");
+            double longitude = rs.getDouble("listing_longitude");
+            double latitude = rs.getDouble("listing_latitude");
+            String town_name = rs.getString("listing_town");
+            String state = rs.getString("listing_state");
+            int quantity = rs.getInt("listing_quantity");
+            int seller_id = rs.getInt("user_id");
+            boolean active = true;
+
+            listing = new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
+                    seller_id,town_name,state,longitude,latitude, quantity);
+        }
+        catch (Exception e)
+        {
+
+        }
+        return listing;
+    }
+    //=============================================================================================================
+    public ArrayList<Listing> getAllActiveListings()
+    {
+        sqlCode = "SELECT *  FROM listing WHERE listing_active is true AND user_id != ?;";
+        ArrayList<Listing> listings = new ArrayList<>();
+        try(Connection connection = JDBC.getConnection())
+        {
+            statement = connection.prepareStatement(sqlCode);
+            statement.setInt(1,UserSession.getSession().getActiveUser().getAccountID());
+            ResultSet rs = statement.executeQuery();
+
+            while(rs.next())
+            {
+                int listing_id = rs.getInt("listing_id");
+                String listing_name = rs.getString("listing_name");
+                String listing_description = rs.getString("listing_description");
+                Date start_date = rs.getDate("listing_start");
+                Date end_date = rs.getDate("listing_end");
+                int listing_price = rs.getInt("listing_price");
+                double longitude = rs.getDouble("listing_longitude");
+                double latitude = rs.getDouble("listing_latitude");
+                String town_name = rs.getString("listing_town");
+                String state = rs.getString("listing_state");
+                int quantity = rs.getInt("listing_quantity");
+                int seller_id = rs.getInt("user_id");
+                boolean active =true;
+
+                listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
+                        seller_id,town_name,state,longitude,latitude, quantity));
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+        return listings;
+    }
+
 }

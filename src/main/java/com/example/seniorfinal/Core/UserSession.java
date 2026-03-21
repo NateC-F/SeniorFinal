@@ -4,6 +4,7 @@ public class UserSession
 {
     private static UserSession session;
     private Account activeUser;
+    private Listing userActiveViewListing;
 
     private UserSession()
     {
@@ -31,7 +32,19 @@ public class UserSession
     public void logout()
     {
         activeUser = null;
+        userActiveViewListing = null;
     }
+
+    public void setActiveViewListing(Listing listing)
+    {
+        userActiveViewListing = listing;
+    }
+
+    public Listing getActiveViewListing()
+    {
+        return userActiveViewListing;
+    }
+
 
 
 }
