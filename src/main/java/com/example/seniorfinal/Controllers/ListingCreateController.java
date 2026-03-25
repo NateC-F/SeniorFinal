@@ -14,9 +14,13 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -54,6 +58,8 @@ public class ListingCreateController implements Initializable
     private String address; // Street,Town,State
     private double longitude;
     private double latitude;
+    private String town ="";
+    private String state="";
 
 
 
@@ -78,7 +84,118 @@ public class ListingCreateController implements Initializable
             latitude = 0;
             longitude = 0;
         }
+        convertLongAndLatToAddr();
+    }
+    //=============================================================================================================
+    public void convertLongAndLatToAddr()
+    {
+        String urlString = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&key=" + APIKEY;
 
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                System.out.println("HTTP error: " + responseCode);
+                return;
+            }
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            in.close();
+
+            JSONObject json = new JSONObject(response.toString());
+            JSONArray results = json.getJSONArray("results");
+
+            if (results.length() > 0) {
+                JSONArray components = results.getJSONObject(0).getJSONArray("address_components");
+
+                for (int i = 0; i < components.length(); i++) {
+                    JSONObject comp = components.getJSONObject(i);
+                    JSONArray types = comp.getJSONArray("types");
+
+                    for (int j = 0; j < types.length(); j++) {
+                        String type = types.getString(j);
+                        if (type.equals("locality")) {
+                            town = comp.getString("long_name");
+                        } else if (type.equals("administrative_area_level_1")) {
+                            String fullState = comp.getString("long_name");
+                            state = stateNameToCode(fullState);
+                        }
+                    }
+                }
+
+            } else {
+                System.out.println("No results found for these coordinates.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    //=============================================================================================================
+    private String stateNameToCode(String fullState) {
+        switch (fullState) {
+            case "Alabama": return "AL";
+            case "Alaska": return "AK";
+            case "Arizona": return "AZ";
+            case "Arkansas": return "AR";
+            case "California": return "CA";
+            case "Colorado": return "CO";
+            case "Connecticut": return "CT";
+            case "Delaware": return "DE";
+            case "Florida": return "FL";
+            case "Georgia": return "GA";
+            case "Hawaii": return "HI";
+            case "Idaho": return "ID";
+            case "Illinois": return "IL";
+            case "Indiana": return "IN";
+            case "Iowa": return "IA";
+            case "Kansas": return "KS";
+            case "Kentucky": return "KY";
+            case "Louisiana": return "LA";
+            case "Maine": return "ME";
+            case "Maryland": return "MD";
+            case "Massachusetts": return "MA";
+            case "Michigan": return "MI";
+            case "Minnesota": return "MN";
+            case "Mississippi": return "MS";
+            case "Missouri": return "MO";
+            case "Montana": return "MT";
+            case "Nebraska": return "NE";
+            case "Nevada": return "NV";
+            case "New Hampshire": return "NH";
+            case "New Jersey": return "NJ";
+            case "New Mexico": return "NM";
+            case "New York": return "NY";
+            case "North Carolina": return "NC";
+            case "North Dakota": return "ND";
+            case "Ohio": return "OH";
+            case "Oklahoma": return "OK";
+            case "Oregon": return "OR";
+            case "Pennsylvania": return "PA";
+            case "Rhode Island": return "RI";
+            case "South Carolina": return "SC";
+            case "South Dakota": return "SD";
+            case "Tennessee": return "TN";
+            case "Texas": return "TX";
+            case "Utah": return "UT";
+            case "Vermont": return "VT";
+            case "Virginia": return "VA";
+            case "Washington": return "WA";
+            case "West Virginia": return "WV";
+            case "Wisconsin": return "WI";
+            case "Wyoming": return "WY";
+            default: return "N/A";
+        }
     }
     //=============================================================================================================
     public void finalizeAddr()
@@ -88,11 +205,11 @@ public class ListingCreateController implements Initializable
     //=============================================================================================================
     public String validateListing()
     {
-     if (nameBox.getText().isEmpty())
+     if (nameBox.getText().trim().isEmpty())
          return "no_name";
      if (nameBox.getText().length()>50)
          return "name_too_long";
-     if (descriptionBox.getText().isEmpty())
+     if (descriptionBox.getText().trim().isEmpty())
          return "no_description";
      if (descriptionBox.getText().length()>1000)
          return "description_too_long";
@@ -108,9 +225,9 @@ public class ListingCreateController implements Initializable
      {return "invalid_price";}
      if (quantityBox.getValue()==null)
         return "invalid_quantity";
-     if (townBox.getText().isEmpty())
+     if (townBox.getText().trim().isEmpty())
          return "no_town";
-     if (streetBox.getText().isEmpty())
+     if (streetBox.getText().trim().isEmpty())
          return "no_street";
      if (categoryBox.getValue()==null)
          return "no_category";
@@ -142,7 +259,7 @@ public class ListingCreateController implements Initializable
                 break;
             case "description_too_long":
                 errorText.setVisible(true);
-                errorText.setText("Name Cannot Be More Than 1000 Characters");
+                errorText.setText("Descriptions Can Only Be 1000 Characters, You Have:" + descriptionBox.getText().length());
                 break;
             case "no_ending_date":
                 errorText.setVisible(true);
@@ -182,7 +299,7 @@ public class ListingCreateController implements Initializable
                 break;
             case "valid":
                 new ListingDAO().CreateListing(nameBox.getText(),descriptionBox.getText(),Integer.parseInt(priceBox.getText()),
-                        Date.valueOf(dateBox.getValue()),stateBox.getValue(),townBox.getText(),longitude,latitude,
+                        Date.valueOf(dateBox.getValue()),stateBox.getValue(),town,longitude,latitude,
                         quantityBox.getValue(),categoryBox.getValue().getId());
                 SceneManager.switchTo(SceneID.MainScreen);
                 break;

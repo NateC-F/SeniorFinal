@@ -1,6 +1,8 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.UserSession;
+import com.example.seniorfinal.Utilities.SceneID;
+import com.example.seniorfinal.Utilities.SceneManager;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -36,6 +38,13 @@ public class ListingViewController implements Initializable
 
         itemMap.setImage(new Image(url));
 
+    }
+    //=============================================================================================================
+    @FXML
+    public void goBack()
+    {
+        UserSession.getSession().setActiveViewListing(null);
+        SceneManager.switchTo(SceneID.MainScreen);
     }
     //=============================================================================================================
     @Override

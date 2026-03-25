@@ -55,6 +55,10 @@ public class SceneManager
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/checkout.fxml"), resX, resY);
                     stage.setTitle("MarketPlace Checkout");
                 }
+                case ListingEditScreen -> {
+                    scene = new Scene(loadFXML("/com/example/seniorfinal/View/editListing.fxml"), resX/2, resY/2);
+                    stage.setTitle("Edit Your Listing");
+                }
             }
 
             if(scene != null)

@@ -7,11 +7,13 @@ import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.net.URL;
@@ -33,20 +35,43 @@ public class MainController implements Initializable
 
         listingHolder.setCellFactory(lv -> new ListCell<>() {
 
-            private final Label nameLabel = new Label();
-            private final Label priceLabel = new Label();
-            private final Button button = new Button("View Listing");
-
-            private final HBox layout = new HBox(10, nameLabel, priceLabel, button);
-
+            private final ImageView imageView = new ImageView();
+            private final Label name = new Label();
+            private final Label description = new Label();
+            private final ScrollPane descriptionScroll = new ScrollPane(description);
+            private final Label price = new Label();
+            private final Label quantity = new Label();
+            private final Label location = new Label();
+            private final Button viewButton = new Button("View Listing");
+            private final Region spacer = new Region();
+            private final VBox textBox = new VBox(5, name, descriptionScroll, price, quantity,location);
+            private final HBox topRow = new HBox(15, imageView, textBox, spacer, viewButton);
+            private final VBox layout = new VBox(topRow);
             {
-                layout.setStyle("-fx-alignment: center-left; -fx-padding: 5;");
+                layout.setStyle("-fx-padding: 10; -fx-border-color: #000; -fx-border-width: 0 0 1 0;");
+                imageView.setFitWidth(200);
+                imageView.setFitHeight(200);
+                description.setWrapText(true);
+                descriptionScroll.setPrefHeight(100);
+                descriptionScroll.setPrefWidth(200);
+                descriptionScroll.setFitToWidth(true);
+                descriptionScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                descriptionScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+                name.setStyle("-fx-font-size: 24px;");
+                HBox.setHgrow(spacer,Priority.ALWAYS);
+                description.setStyle("-fx-font-size: 16px;");
+                price.setStyle("-fx-font-size: 16px;");
+                quantity.setStyle("-fx-font-size: 16px;");
+                viewButton.setPrefSize(100,75);
+                viewButton.setStyle("-fx-font-size: 14px;");
+                location.setStyle("-fx-font-size: 16px;");
 
-                // Button action
-                button.setOnAction(e -> {
+                viewButton.setOnAction(e -> {
                     Listing listing = getItem();
-                    UserSession.getSession().setActiveViewListing(listing);
-                    SceneManager.switchTo(SceneID.ListingViewScreen);
+                    if (listing != null) {
+                        UserSession.getSession().setActiveViewListing(listing);
+                        SceneManager.switchTo(SceneID.ListingViewScreen);
+                    }
                 });
             }
 
@@ -57,10 +82,13 @@ public class MainController implements Initializable
                 if (empty || listing == null) {
                     setGraphic(null);
                 } else {
-                    nameLabel.setText(listing.getName());
-                    priceLabel.setText("$" + listing.getPrice());
-
+                    name.setText(listing.getName());
+                    description.setText("Description: " + listing.getDescription());
+                    price.setText("Price: $" + listing.getPrice());
+                    quantity.setText("Quantity For Sale: " + listing.getQuantity());
+                    imageView.setImage(new Image("https://www.shutterstock.com/shutterstock/photos/2585078665/display_1500/stock-vector-clean-and-minimal-coming-soon-sign-2585078665.jpg"));
                     setGraphic(layout);
+                    location.setText("Item Location: " + listing.getTown() +", " + listing.getState());
                 }
             }
         });

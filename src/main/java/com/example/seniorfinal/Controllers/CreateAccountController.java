@@ -23,8 +23,8 @@ public class CreateAccountController
     @FXML
     private void createAccount()
     {
-        String username = nameField.getText();
-        String password = passField.getText();
+        String username = nameField.getText().trim();
+        String password = passField.getText().trim();
         if (accountDAO.createAccount(username,password))
         {
             accountCreateFlag.setFill(Color.GREEN);

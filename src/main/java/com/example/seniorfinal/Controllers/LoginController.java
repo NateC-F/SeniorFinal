@@ -69,7 +69,6 @@ public class LoginController
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/seniorfinal/View/createAccount.fxml"));
             Parent root = loader.load();
-            CreateAccountController controller = loader.getController();
             Stage newStage = new Stage();
             newStage.setTitle("Create A New Account");
             newStage.setScene(new Scene(root));
