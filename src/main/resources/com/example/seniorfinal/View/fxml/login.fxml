@@ -6,13 +6,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.LoginController">
+<AnchorPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.LoginController">
    <children>
-      <HBox prefHeight="400.0" prefWidth="600.0">
+      <HBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0">
          <children>
-            <VBox prefHeight="400.0" prefWidth="300.0">
+            <VBox alignment="TOP_CENTER" prefHeight="400.0" prefWidth="300.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Account Name">
                      <VBox.margin>
@@ -30,17 +31,23 @@
                      <VBox.margin>
                         <Insets left="10.0" />
                      </VBox.margin></TextField>
-                  <HBox prefHeight="31.0" prefWidth="300.0" spacing="130.0">
+                  <HBox prefHeight="31.0" prefWidth="300.0" spacing="50.0">
                      <children>
-                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" prefHeight="25.0" prefWidth="57.0" text="Login">
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" prefHeight="30.0" prefWidth="67.0" text="Login">
                            <HBox.margin>
                               <Insets left="10.0" top="5.0" />
                            </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
                         </Button>
-                        <Button fx:id="createAccountButton" mnemonicParsing="false" onAction="#openCreateAccountWindow" prefHeight="25.0" prefWidth="115.0" text="Create Account">
+                        <Button fx:id="createAccountButton" mnemonicParsing="false" onAction="#openCreateAccountWindow" prefHeight="30.0" prefWidth="154.0" text="Create Account">
                            <HBox.margin>
                               <Insets top="5.0" />
                            </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
                         </Button>
                      </children>
                   </HBox>
@@ -52,6 +59,9 @@
                </children>
             </VBox>
          </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
       </HBox>
    </children>
 </AnchorPane>

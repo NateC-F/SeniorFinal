@@ -4,16 +4,12 @@ import com.example.seniorfinal.Model.DAO.AccountDAO;
 import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 
-public class LoginController
+public class AdminLoginController
 {
-
     @FXML
     private TextField nameField;
 
@@ -25,16 +21,17 @@ public class LoginController
 
     private AccountDAO accountDAO = new AccountDAO();
 
-    //=============================================================================================================
+
     @FXML
     private void login()
     {
+        errorFlag.setFill(Color.RED);
         String username = nameField.getText();
         String password = passField.getText();
 
-        String loginFlag = accountDAO.login(username, password,false);
+        String loginFlag = accountDAO.login(username, password, true);
 
-        switch(loginFlag)
+        switch (loginFlag)
         {
             case "SUCCESS":
                 SceneManager.switchTo(SceneID.MainScreen);
@@ -59,25 +56,6 @@ public class LoginController
                 errorFlag.setVisible(true);
                 errorFlag.setText("PASSWORD FIELD CANNOT BE BLANK");
                 break;
-        }
-
-    }
-    //=============================================================================================================
-    @FXML
-    public void openCreateAccountWindow()
-    {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/seniorfinal/View/fxml/createAccount.fxml"));
-            Parent root = loader.load();
-            Stage newStage = new Stage();
-            newStage.setTitle("Create A New Account");
-            Scene scene = new Scene(root);
-            String css = getClass().getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm();
-            scene.getStylesheets().add(css);
-            newStage.setScene(scene);
-            newStage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

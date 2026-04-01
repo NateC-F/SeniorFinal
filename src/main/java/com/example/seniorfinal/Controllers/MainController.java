@@ -44,16 +44,17 @@ public class MainController implements Initializable
             private final Label location = new Label();
             private final Button viewButton = new Button("View Listing");
             private final Region spacer = new Region();
-            private final VBox textBox = new VBox(5, name, descriptionScroll, price, quantity,location);
-            private final HBox topRow = new HBox(15, imageView, textBox, spacer, viewButton);
+            private final VBox textBox = new VBox(5, name, price, quantity,location);
+            private final HBox topRow = new HBox(15, imageView, textBox, descriptionScroll, spacer, viewButton);
             private final VBox layout = new VBox(topRow);
             {
-                layout.setStyle("-fx-padding: 10; -fx-border-color: #000; -fx-border-width: 0 0 1 0;");
+
+                layout.setStyle("-fx-padding: 10; -fx-border-color: #000; -fx-border-width: 0 0 1 0;" );
                 imageView.setFitWidth(200);
                 imageView.setFitHeight(200);
                 description.setWrapText(true);
                 descriptionScroll.setPrefHeight(100);
-                descriptionScroll.setPrefWidth(200);
+                descriptionScroll.setPrefWidth(400);
                 descriptionScroll.setFitToWidth(true);
                 descriptionScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
                 descriptionScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);

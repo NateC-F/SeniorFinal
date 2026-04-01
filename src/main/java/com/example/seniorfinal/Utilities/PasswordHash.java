@@ -6,12 +6,13 @@ public class PasswordHash
     public PasswordHash()
     {}
 
-    public String hashString(String string)
+    public static String hashString(String string)
     {
         return BCrypt.hashpw(string,BCrypt.gensalt());
     }
-    public boolean verifyPassword(String password, String hash)
+    public static boolean verifyHash(String string, String hash)
     {
-        return BCrypt.checkpw(password, hash);
+        return BCrypt.checkpw(string, hash);
     }
+
 }

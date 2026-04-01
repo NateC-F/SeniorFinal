@@ -10,6 +10,8 @@ public enum SceneID
     ProfileScreen,
     OrderHistoryScreen,
     CheckoutScreen,
-    ListingEditScreen
+    ListingEditScreen,
+    AdminScreen,
+    AdminLogin
 
 }

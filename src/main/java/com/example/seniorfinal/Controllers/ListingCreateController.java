@@ -236,7 +236,8 @@ public class ListingCreateController implements Initializable
      try{convertAddrToLongAndLat();}
      catch (Exception e)
         {return "invalid_location";}
-
+     if (longitude == 0 && latitude == 0)
+         return "invalid_location";
      return "valid";
     }
     //=============================================================================================================

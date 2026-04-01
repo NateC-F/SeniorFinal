@@ -1,0 +1,117 @@
+/* --------- Root Styles --------- */
+.root {
+    -fx-background-color: #121212; /* Dark black background */
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-text-fill: #E0E0E0; /* Light gray text */
+}
+
+/* --------- Labels & Text --------- */
+.label {
+    -fx-text-fill: #E0E0E0;
+}
+
+.header-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FF4C4C; /* Red headers */
+}
+
+.text-node, Text {
+    -fx-fill: #E0E0E0; /* Light gray default text */
+}
+/* --------- Buttons --------- */
+.button {
+    -fx-background-color: #FF4C4C;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 6 12 6 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #E03A3A; /* Darker red on hover */
+}
+
+.button:pressed {
+    -fx-background-color: #B92B2B; /* Even darker red on press */
+}
+
+/* --------- ListCell / Table Rows --------- */
+.list-cell {
+    -fx-background-color: #1E1E1E; /* Dark gray row background */
+    -fx-padding: 8;
+    -fx-border-color: #2A2A2A; /* subtle border between rows */
+    -fx-border-width: 0 0 1 0;
+}
+
+.list-cell:selected {
+    -fx-background-color: #2A2A2A; /* Slight highlight for selection */
+}
+
+/* --------- ScrollPane --------- */
+.scroll-pane {
+    -fx-background-color: #121212;
+    -fx-border-color: #2A2A2A;
+    -fx-border-width: 1;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #FF4C4C; /* Red scroll thumb */
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+    -fx-background-color: #1E1E1E; /* Dark track */
+}
+
+/* --------- TextField / Input --------- */
+.text-field, .text-area, .password-field {
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: #E0E0E0;
+    -fx-border-color: #FF4C4C;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 8 5 8;
+}
+
+/* --------- ComboBox --------- */
+.combo-box {
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #FF4C4C;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 8 5 8;
+}
+
+/* --------- Tabs --------- */
+.tab-pane {
+    -fx-background-color: #121212;
+}
+
+.tab {
+    -fx-background-color: #1E1E1E;
+    -fx-text-base-color: #E0E0E0;
+}
+
+.tab:selected {
+    -fx-background-color: #2A2A2A;
+    -fx-text-base-color: #FF4C4C;
+}
+
+/* --------- Alerts / Warnings --------- */
+.label-warning {
+    -fx-text-fill: #FF6666;
+}
+
+.label-info {
+    -fx-text-fill: #FF4C4C;
+}
+
+/* --------- HBox / VBox / Containers --------- */
+.hbox, .vbox {
+    -fx-spacing: 10;
+}

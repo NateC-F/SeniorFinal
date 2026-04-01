@@ -16,7 +16,6 @@ public class AccountDAO
     private static String name;
     private static int id;
     private String sqlCode;
-    private PasswordHash passwordHasher;
     private PreparedStatement statement;
     private static Account activeAccount;
     private static Account listingAccount;
@@ -24,13 +23,12 @@ public class AccountDAO
     public AccountDAO(){
         activeAccount = new ActiveUser();
         listingAccount = new ListingUser();
-        passwordHasher = new PasswordHash();
     }
 //=============================================================================================================
     public boolean createAccount(String accountName, String accountPass)
     {
         sqlCode = "INSERT INTO user_profile (user_name, user_pass) VALUES (?,?)";
-        String hashedPass = passwordHasher.hashString(accountPass);
+        String hashedPass = PasswordHash.hashString(accountPass);
 
         try(Connection connection = JDBC.getConnection())
         {
@@ -47,9 +45,12 @@ public class AccountDAO
         }
     }
 //=============================================================================================================
-    public String login(String accountName, String pass)
+    public String login(String accountName, String pass, boolean adminLogin)
     {
-        sqlCode = "SELECT * FROM user_profile WHERE user_name = ?";
+        if (!adminLogin)
+            sqlCode = "SELECT * FROM user_profile WHERE user_name = ?";
+        else
+            sqlCode = "SELECT * FROM user_profile WHERE user_name = ? AND user_role = 'ADMIN'";
 
         if (accountName.isEmpty())
             return "NULL NAME";
@@ -66,7 +67,7 @@ public class AccountDAO
                     return "USERNAME ERROR";
                 String hashedPass = resultSet.getString("user_pass");
 
-                if (!passwordHasher.verifyPassword(pass, hashedPass))
+                if (!PasswordHash.verifyHash(pass, hashedPass))
                     return "PASSWORD ERROR";
 
                 activeAccount.setAccountID(resultSet.getInt("user_id"));
@@ -81,6 +82,5 @@ public class AccountDAO
             }
     }
 //=============================================================================================================
-
 
 }
