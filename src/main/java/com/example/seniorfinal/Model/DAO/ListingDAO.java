@@ -1,13 +1,13 @@
 package com.example.seniorfinal.Model.DAO;
 
+import com.example.seniorfinal.Core.CartItem;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.JDBC;
+import com.example.seniorfinal.Utilities.SceneID;
+import com.example.seniorfinal.Utilities.SceneManager;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -17,10 +17,10 @@ public class ListingDAO
     private PreparedStatement statement;
 
 //=============================================================================================================
-    public void CreateListing(String listingName, String listingDescription, int listingPrice, Date endingDate,
-                              String state, String town, double longitude, double latitude, int listingQuantity, int categoryID)
+    public boolean CreateListing(String listingName, String listingDescription, int listingPrice, Date endingDate,
+                              String state, String town, double longitude, double latitude, int listingQuantity, int categoryID, Blob listingImage)
     {
-        sqlCode = "CALL create_listing(?,?,?,?,?,?,?,?,?,?,?)";
+        sqlCode = "CALL create_listing(?,?,?,?,?,?,?,?,?,?,?,?)";
 
 //      CREATE PROCEDURE create_listing(
 //      1)IN listing_input_name VARCHAR(50),
@@ -33,8 +33,8 @@ public class ListingDAO
 //      8)IN listing_input_longitude DECIMAL(9,6),
 //      9)IN listing_input_latitude DECIMAL(9,6),
 //      10)IN listing_input_quantity INT,
-//      11)IN listing_input_categoryID INT)
-
+//      11)IN listing_input_categoryID INT,
+//      12)IN listing_input_image BLOB
         try(Connection connection = JDBC.getConnection())
         {
             statement = connection.prepareStatement(sqlCode);
@@ -49,13 +49,16 @@ public class ListingDAO
             statement.setDouble(9,latitude);
             statement.setInt(10, listingQuantity);
             statement.setInt(11, categoryID);
+            statement.setBlob(12, listingImage);
             statement.executeUpdate();
         }
         catch (Exception e)
         {
             System.out.println(e);
+            return false;
         }
 
+        return true;
     }
     //=============================================================================================================
     public Listing getListing(int listingID)
@@ -81,10 +84,11 @@ public class ListingDAO
             String state = rs.getString("listing_state");
             int quantity = rs.getInt("listing_quantity");
             int seller_id = rs.getInt("user_id");
+            Blob listingImage = rs.getBlob("listing_picture");
             boolean active = true;
 
             listing = new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                    seller_id,town_name,state,longitude,latitude, quantity);
+                    seller_id,town_name,state,longitude,latitude, quantity,listingImage);
         }
         catch (Exception e)
         {
@@ -117,10 +121,11 @@ public class ListingDAO
                 String state = rs.getString("listing_state");
                 int quantity = rs.getInt("listing_quantity");
                 int seller_id = rs.getInt("user_id");
+                Blob listingImage = rs.getBlob("listing_picture");
                 boolean active =true;
 
                 listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                        seller_id,town_name,state,longitude,latitude, quantity));
+                        seller_id,town_name,state,longitude,latitude, quantity,listingImage));
             }
         }
         catch (Exception e)
@@ -154,10 +159,11 @@ public class ListingDAO
                 String state = rs.getString("listing_state");
                 int quantity = rs.getInt("listing_quantity");
                 int seller_id = rs.getInt("user_id");
+                Blob listingImage = rs.getBlob("listing_picture");
                 boolean active =rs.getBoolean("listing_active");
 
                 listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                        seller_id,town_name,state,longitude,latitude, quantity));
+                        seller_id,town_name,state,longitude,latitude, quantity,listingImage));
             }
         }
         catch (Exception e)
@@ -170,6 +176,28 @@ public class ListingDAO
     public void deleteListing(int listingID)
     {
         sqlCode = "CALL delete_listing("+ listingID + ")";
+    }
+    //=============================================================================================================
+    public void purchase(CartItem item)
+    {
+        // IN listing_input_id INT,
+        // IN listing_buyer_id INT,
+        // IN purchase_amount INT
+        sqlCode = "CALL buy_listing(?, ?, ?)";
+        try (Connection connection = JDBC.getConnection())
+        {
+            CallableStatement statement = connection.prepareCall(sqlCode);
+            statement.setInt(1, item.getListing().getId());
+            statement.setInt(2, UserSession.getSession().getActiveUser().getAccountID());
+            statement.setInt(3, item.getQuantity());
+
+            statement.execute();
+            UserSession.getSession().setActiveViewListing(null);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
     }
     //=============================================================================================================
 }

@@ -8,6 +8,8 @@ module com.example.seniorfinal {
     requires org.json;
     requires javafx.web;
     requires java.net.http;
+    requires javafx.swing;
+    requires com.stripe;
 
 
     opens com.example.seniorfinal to javafx.fxml;

@@ -34,7 +34,7 @@ public class AdminLoginController
         switch (loginFlag)
         {
             case "SUCCESS":
-                SceneManager.switchTo(SceneID.MainScreen);
+                SceneManager.switchTo(SceneID.AdminScreen);
                 break;
             case "USERNAME ERROR":
                 errorFlag.setVisible(true);

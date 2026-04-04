@@ -1,10 +1,12 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.Category;
+import com.example.seniorfinal.Core.ImageBlob;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.Location;
 import com.example.seniorfinal.Model.DAO.CategoryDAO;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
+import com.example.seniorfinal.Utilities.JDBC;
 import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
 import javafx.fxml.FXML;
@@ -13,20 +15,23 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Blob;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
@@ -52,6 +57,9 @@ public class ListingCreateController implements Initializable
     DatePicker dateBox;
     @FXML
     Text errorText;
+    @FXML
+    ImageView picturePreview;
+
 
 
     private final String APIKEY = "AIzaSyDcL0ii3auquxDciREAu8QGQM9K1-0bQng";
@@ -60,6 +68,7 @@ public class ListingCreateController implements Initializable
     private double latitude;
     private String town ="";
     private String state="";
+    private Blob image;
 
 
 
@@ -126,9 +135,16 @@ public class ListingCreateController implements Initializable
                         String type = types.getString(j);
                         if (type.equals("locality")) {
                             town = comp.getString("long_name");
-                        } else if (type.equals("administrative_area_level_1")) {
+                            break; // stop checking other types for this component
+                        }
+                        else if (type.equals("administrative_area_level_1")) {
                             String fullState = comp.getString("long_name");
-                            state = stateNameToCode(fullState);
+                            String code = stateNameToCode(fullState);
+                            if (code != null) {
+                                state = code;
+                            }
+                            else state = "N/A";
+                            break; // stop checking other types for this component
                         }
                     }
                 }
@@ -236,13 +252,17 @@ public class ListingCreateController implements Initializable
      try{convertAddrToLongAndLat();}
      catch (Exception e)
         {return "invalid_location";}
+     if (state.equals("N/A"))
+         return "invalid_location";
      if (longitude == 0 && latitude == 0)
          return "invalid_location";
+     if (picturePreview.getImage() == null || picturePreview.getImage().isError())
+         return "null_image";
      return "valid";
     }
     //=============================================================================================================
     @FXML
-    public void createListing() throws IOException, InterruptedException
+    public void createListing() throws IOException, InterruptedException, SQLException
     {
         switch (validateListing())
         {
@@ -298,16 +318,61 @@ public class ListingCreateController implements Initializable
                 errorText.setVisible(true);
                 errorText.setText("The Location You Entered Wasn't Valid");
                 break;
+            case "null_image":
+                errorText.setVisible(true);
+                errorText.setText("You Must Upload A Picture Of Your Item");
+                break;
             case "valid":
-                new ListingDAO().CreateListing(nameBox.getText(),descriptionBox.getText(),Integer.parseInt(priceBox.getText()),
-                        Date.valueOf(dateBox.getValue()),stateBox.getValue(),town,longitude,latitude,
-                        quantityBox.getValue(),categoryBox.getValue().getId());
-                SceneManager.switchTo(SceneID.MainScreen);
+                image = ImageBlob.imageToBlob(picturePreview.getImage(), JDBC.getConnection());
+                if(new ListingDAO().CreateListing(nameBox.getText(),descriptionBox.getText(),Integer.parseInt(priceBox.getText()),
+                        Date.valueOf(dateBox.getValue()),state,town,longitude,latitude,
+                        quantityBox.getValue(),categoryBox.getValue().getId(),image))
+                    SceneManager.switchTo(SceneID.MainScreen);
+                else
+                {
+                    errorText.setVisible(true);
+                    errorText.setText("There Was An Issue Creating Your Listing Try Again Later");
+                }
                 break;
             default:
                 errorText.setVisible(true);
                 errorText.setText("There Was An Issue Creating Your Listing Try Again Later");
                 break;
+        }
+    }
+    //=============================================================================================================
+    @FXML
+    public void uploadImage()
+    {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Your Image");
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg");
+        fileChooser.getExtensionFilters().add(filter);
+
+        String userHome = System.getProperty("user.home");
+        File defaultDir = new File(userHome, "Pictures");
+        if (defaultDir.exists() && defaultDir.isDirectory()) {
+            fileChooser.setInitialDirectory(defaultDir);
+        }
+
+        File selectedFile = fileChooser.showOpenDialog(picturePreview.getScene().getWindow());
+        if (selectedFile != null) {
+            try {
+                Image image = new Image(new FileInputStream(selectedFile));
+                if (image.isError()) {
+                    System.out.println("Error loading image: " + image.getException());
+                    errorText.setText("Unsupported or corrupted image");
+                    errorText.setVisible(true);
+                    return;
+                }
+                picturePreview.setImage(image);
+                errorText.setVisible(false);
+                System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+                errorText.setText("Image Not Available Try Again");
+                errorText.setVisible(true);
+            }
         }
     }
     //=============================================================================================================

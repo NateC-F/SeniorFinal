@@ -5,6 +5,7 @@ public class UserSession
     private static UserSession session;
     private Account activeUser;
     private Listing userActiveViewListing;
+    private Cart userCart;
 
     private UserSession()
     {
@@ -22,6 +23,7 @@ public class UserSession
     public void setActiveUser(Account user)
     {
         this.activeUser = user;
+        userCart = new Cart();
     }
 
     public Account getActiveUser()
@@ -33,6 +35,7 @@ public class UserSession
     {
         activeUser = null;
         userActiveViewListing = null;
+        userCart = null;
     }
 
     public void setActiveViewListing(Listing listing)
@@ -46,5 +49,13 @@ public class UserSession
     }
 
 
+    public Cart getUserCart()
+    {
+        return userCart;
+    }
 
+    public void setUserCart(Cart userCart)
+    {
+        this.userCart = userCart;
+    }
 }

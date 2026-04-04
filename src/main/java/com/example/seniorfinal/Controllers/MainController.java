@@ -1,5 +1,6 @@
 package com.example.seniorfinal.Controllers;
 
+import com.example.seniorfinal.Core.ImageBlob;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
@@ -31,6 +32,7 @@ public class MainController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
+        System.out.println("Menu + " + UserSession.getSession().getUserCart().getItems().size());
         welcomeText.setText("Welcome to MarketPlace "+UserSession.getSession().getActiveUser().getAccountName());
 
         listingHolder.setCellFactory(lv -> new ListCell<>() {
@@ -79,17 +81,26 @@ public class MainController implements Initializable
             @Override
             protected void updateItem(Listing listing, boolean empty) {
                 super.updateItem(listing, empty);
-
                 if (empty || listing == null) {
                     setGraphic(null);
                 } else {
+                    boolean inCart = UserSession.getSession().getUserCart().isListingInCart(listing);
+
+                    if (inCart) {
+                        // Hide the listing completely if it's in the cart
+                        setGraphic(null);
+                        return;
+                    }
+
+                    // Update UI with remaining quantity
                     name.setText(listing.getName());
                     description.setText("Description: " + listing.getDescription());
                     price.setText("Price: $" + listing.getPrice());
-                    quantity.setText("Quantity For Sale: " + listing.getQuantity());
-                    imageView.setImage(new Image("https://www.shutterstock.com/shutterstock/photos/2585078665/display_1500/stock-vector-clean-and-minimal-coming-soon-sign-2585078665.jpg"));
+                    quantity.setText("Available: " + listing.getQuantity());
+                    location.setText("Item Location: " + listing.getTown() + ", " + listing.getState());
+                    imageView.setImage(ImageBlob.blobToImage(listing.getListing_image()));
+
                     setGraphic(layout);
-                    location.setText("Item Location: " + listing.getTown() +", " + listing.getState());
                 }
             }
         });
@@ -109,6 +120,11 @@ public class MainController implements Initializable
     public void newListing()
     {
         SceneManager.switchTo(SceneID.ListingCreateScreen);
+    }
+    //=============================================================================================================
+    public void openCheckOut()
+    {
+        SceneManager.switchTo(SceneID.CheckoutScreen);
     }
     //=============================================================================================================
     @FXML

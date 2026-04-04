@@ -1,8 +1,7 @@
 package com.example.seniorfinal.Model.DAO;
 
 import com.example.seniorfinal.Core.Account;
-import com.example.seniorfinal.Core.ActiveUser;
-import com.example.seniorfinal.Core.ListingUser;
+import com.example.seniorfinal.Core.UserAccount;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.JDBC;
 import com.example.seniorfinal.Utilities.PasswordHash;
@@ -10,6 +9,8 @@ import com.example.seniorfinal.Utilities.PasswordHash;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class AccountDAO
 {
@@ -21,8 +22,7 @@ public class AccountDAO
     private static Account listingAccount;
 
     public AccountDAO(){
-        activeAccount = new ActiveUser();
-        listingAccount = new ListingUser();
+        activeAccount = new UserAccount();
     }
 //=============================================================================================================
     public boolean createAccount(String accountName, String accountPass)
@@ -82,5 +82,37 @@ public class AccountDAO
             }
     }
 //=============================================================================================================
+    public ArrayList<Account> getUserAccounts()
+    {
+        sqlCode = "Select * From user_profile WHERE user_role = 'USER'";
+        ArrayList<Account> accountList = new ArrayList<>();
+
+        try(Connection connection = JDBC.getConnection())
+        {
+            PreparedStatement statement = connection.prepareStatement(sqlCode);
+            ResultSet rs = statement.executeQuery();
+
+            while(rs.next())
+            {
+                int userId = rs.getInt("user_id");
+                String userName = rs.getString("user_name");
+                LocalDate createDate = rs.getDate("create_date").toLocalDate();
+
+                UserAccount tempAccount = new UserAccount();
+                tempAccount.setAccountName(userName);
+                tempAccount.setAccountID(userId);
+                tempAccount.setCreationDate(createDate);
+
+                accountList.add(tempAccount);
+
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+
+        return accountList;
+    }
 
 }

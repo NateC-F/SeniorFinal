@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.seniorfinal.Controllers.AdminViewController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.AdminViewController">
+   <children>
+      <TableView layoutY="110.0" prefHeight="611.0" prefWidth="1280.0">
+        <columns>
+          <TableColumn fx:id="C1" minWidth="400.0" prefWidth="400.0" text="C1" />
+          <TableColumn fx:id="C2" minWidth="400.0" prefWidth="400.0" text="C2" />
+            <TableColumn fx:id="C3" minWidth="400.0" prefWidth="400.0" text="C3" />
+            <TableColumn fx:id="C4" text="C4" />
+        </columns>
+      </TableView>
+      <MenuButton layoutY="85.0" mnemonicParsing="false" text="MenuButton">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Show Accounts" />
+          <MenuItem mnemonicParsing="false" text="Show Listings" />
+        </items>
+      </MenuButton>
+   </children>
 </AnchorPane>

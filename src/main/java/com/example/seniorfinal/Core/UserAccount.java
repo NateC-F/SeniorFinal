@@ -1,13 +1,14 @@
 package com.example.seniorfinal.Core;
 
-import com.example.seniorfinal.Model.DAO.AccountDAO;
+import java.time.LocalDate;
 
-public class ActiveUser implements Account
+public class UserAccount implements Account
 {
     private String accountName;
     private int accountID;
+    private LocalDate creationDate;
 
-    public ActiveUser()
+    public UserAccount()
     {
     }
 
@@ -37,4 +38,15 @@ public class ActiveUser implements Account
         return accountID;
     }
 
+    @Override
+    public LocalDate getCreationDate()
+    {
+        return creationDate;
+    }
+
+    @Override
+    public void setCreationDate(LocalDate creationDate)
+    {
+        this.creationDate = creationDate;
+    }
 }
