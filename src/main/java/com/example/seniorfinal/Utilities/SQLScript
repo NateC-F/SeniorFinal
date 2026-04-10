@@ -179,6 +179,17 @@ BEGIN
 END //
 DELIMITER ;
 
+-- UPON ZERO QUANTITY MAKE INACTIVE
+DELIMITER //
+CREATE TRIGGER listing_quantity_zero
+BEFORE UPDATE ON listing
+FOR EACH ROW
+BEGIN
+    IF NEW.listing_quantity = 0 THEN
+        SET NEW.listing_active = FALSE;
+    END IF;
+END//
+DELIMITER ;
 
 -- ============================
 --         TABLE PROCEDURES
@@ -187,7 +198,7 @@ DELIMITER ;
 -- Create Listing
 DELIMITER //
 CREATE PROCEDURE create_listing(IN listing_input_name VARCHAR(50), IN listing_input_description VARCHAR(1000), IN listing_input_userID INT, IN listing_input_price INT, IN listing_input_endTime DATE,
-								IN listing_input_state VARCHAR(2), IN listing_input_town VARCHAR(50), IN listing_input_longitude DECIMAL(9,6), IN listing_input_latitude DECIMAL(9,6), IN listing_input_quantity INT,
+								IN listing_input_state VARCHAR(3), IN listing_input_town VARCHAR(50), IN listing_input_longitude DECIMAL(9,6), IN listing_input_latitude DECIMAL(9,6), IN listing_input_quantity INT,
                                 IN listing_input_categoryID INT, IN listing_input_image LONGBLOB)
 BEGIN
 	IF (listing_input_endTime IS NULL) THEN
@@ -204,29 +215,47 @@ BEGIN
 END //
 DELIMITER ;
 
--- Buy listing
+-- Buy Listing
 DELIMITER //
 CREATE PROCEDURE buy_listing(IN listing_input_id INT, IN listing_buyer_id INT, IN purchase_amount INT)
 BEGIN
-	DECLARE seller_variable_id INT;
+    DECLARE seller_variable_id INT;
     DECLARE selling_price INT;
+    DECLARE is_active BOOLEAN;
+    DECLARE current_quantity INT;
 
-    SELECT user_id, listing_price
-    INTO seller_variable_id, selling_price
+	START TRANSACTION;
+    SELECT user_id, listing_price, listing_active, listing_quantity
+    INTO seller_variable_id, selling_price, is_active, current_quantity
     FROM listing
     WHERE listing_id = listing_input_id;
+
+    IF seller_variable_id IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Listing does not exist';
+    END IF;
+
+    IF is_active = FALSE THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Item cannot be purchased: listing is inactive';
+    END IF;
+
+    IF purchase_amount > current_quantity THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Not enough quantity available';
+    END IF;
 
     INSERT INTO order_history(listing_id, buyer_id, seller_id, purchase_price, purchase_quantity)
     VALUES (listing_input_id, listing_buyer_id, seller_variable_id, selling_price, purchase_amount);
 
-	UPDATE listing
-	SET
-		listing_quantity = listing_quantity - purchase_amount,
-		listing_active = CASE
-			WHEN listing_quantity - purchase_amount <= 0 THEN FALSE
-			ELSE listing_active
-		END
-	WHERE listing_id = listing_input_id;
+    UPDATE listing
+    SET
+        listing_quantity = listing_quantity - purchase_amount,
+        listing_active = CASE
+            WHEN listing_quantity <= 0 THEN FALSE
+            ELSE listing_active
+        END
+    WHERE listing_id = listing_input_id;
 
 END //
 DELIMITER ;
@@ -243,6 +272,30 @@ DELIMITER ;
 -- ============================
 --         TABLE INDEXES
 -- ============================
+-- Frequently used for lookups in buy_listing
+CREATE INDEX idx_listing_id_active_qty
+ON listing (listing_id, listing_active, listing_quantity);
+
+-- Helps filtering active listings (marketplace view)
+CREATE INDEX idx_listing_active
+ON listing (listing_active);
+
+-- Helps location-based searches
+CREATE INDEX idx_listing_location
+ON listing (listing_state, listing_town);
+
+-- Helps price filtering/sorting
+CREATE INDEX idx_listing_price
+ON listing (listing_price);
+
+-- Helps expiration/event queries
+CREATE INDEX idx_listing_end
+ON listing (listing_end);
+
+-- Buyer history lookups
+CREATE INDEX idx_order_buyer
+ON order_history (buyer_id);
+
 
 
 Select *
@@ -251,10 +304,16 @@ From user_profile;
 Select *
 From listing;
 
-UPDATE listing
-SET listing_active = FALSE
-WHERE listing_id = 1;
+Select *
+from order_history;
 
+UPDATE listing
+SET listing_quantity = 5
+WHERE listing_id = 2;
+
+UPDATE listing
+SET listing_active = true
+WHERE listing_id = 1;
 
 INSERT INTO user_profile (user_name, user_pass, user_role)
 VALUES ('admin', '$2a$10$3Fa2OzaAW/FM3.y4GUIO9eT2jBqYqg5c18KAQwCWDEW1XgDJV8/yu', 'ADMIN');

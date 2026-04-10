@@ -2,12 +2,11 @@ package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.CartItem;
 import com.example.seniorfinal.Core.Listing;
+import com.example.seniorfinal.Core.PurchaseResult;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
-import com.example.seniorfinal.Utilities.JDBC;
-import com.example.seniorfinal.Utilities.SceneID;
-import com.example.seniorfinal.Utilities.SceneManager;
-import com.example.seniorfinal.Utilities.StripePayment;
+import com.example.seniorfinal.Utilities.*;
+import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.tax.Registration;
 import javafx.fxml.FXML;
@@ -21,6 +20,7 @@ import javafx.scene.text.Text;
 import java.net.URL;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -33,6 +33,8 @@ public class CheckoutController implements Initializable
     ComboBox<Integer> quantityBox;
     @FXML
     private ListView<CartItem> cartListView;
+    @FXML
+    private Text errorText;
 
     String sqlCode;
     //=============================================================================================================
@@ -52,26 +54,31 @@ public class CheckoutController implements Initializable
     @FXML
     public void purchase()
     {
-        long chargeAmount = UserSession.getSession().getUserCart().getCartTotal() * 100L; //Stripe api requires the amount to be in cents
-
-        try{
-            for (CartItem items : UserSession.getSession().getUserCart().getItems())
-            {
-                new ListingDAO().purchase(items);
-            }
-            UserSession.getSession().getUserCart().removeAllItemsFromCart();
-
-           PaymentIntent paymentIntent = StripePayment.createPaymentIntent(chargeAmount,"usd");
-           String clientSecrete = paymentIntent.getClientSecret();
-           System.out.println("Client Secrete: "+ clientSecrete+", the total charge was: "+chargeAmount/100);
-           System.out.println("Purchase was successful no real payment necessary");
-        }
-        catch (Exception e)
+        PurchaseResult result = new ListingDAO().purchaseCart(UserSession.getSession().getUserCart());
+        int totalBefore = UserSession.getSession().getUserCart().getCartTotal();
+        if (!result.failedMessages.isEmpty())
         {
-            System.out.println(e);
-            System.out.println("Stripe crashed");
+            errorText.setVisible(true);
+            errorText.setText(String.join("\n", result.failedMessages));
+            loadCart();
         }
-        SceneManager.switchTo(SceneID.MainScreen);
+        try
+        {
+            int chargeAmountInt = totalBefore-result.totalCharge;
+            Long chargeAmountLong = chargeAmountInt *100L;
+            PaymentIntent paymentIntent = StripePayment.createPaymentIntent(chargeAmountLong, "usd");
+            String clientSecret = paymentIntent.getClientSecret();
+
+            System.out.println("Client Secret: " + clientSecret + ", total: $" + chargeAmountInt);
+        }
+        catch (ListingNotFoundException | ListingInactiveException | InsufficientQuantityException | StripeException e)
+        {
+            errorText.setVisible(true);
+            errorText.setText(e.getMessage());
+            loadCart();
+        }
+        if (UserSession.getSession().getUserCart().getItems().isEmpty())
+            SceneManager.switchTo(SceneID.MainScreen);
     }
     //=============================================================================================================
     private void loadCart() {

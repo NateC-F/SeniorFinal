@@ -1,11 +1,7 @@
 package com.example.seniorfinal.Model.DAO;
 
-import com.example.seniorfinal.Core.CartItem;
-import com.example.seniorfinal.Core.Listing;
-import com.example.seniorfinal.Core.UserSession;
-import com.example.seniorfinal.Utilities.JDBC;
-import com.example.seniorfinal.Utilities.SceneID;
-import com.example.seniorfinal.Utilities.SceneManager;
+import com.example.seniorfinal.Core.*;
+import com.example.seniorfinal.Utilities.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -178,26 +174,41 @@ public class ListingDAO
         sqlCode = "CALL delete_listing("+ listingID + ")";
     }
     //=============================================================================================================
-    public void purchase(CartItem item)
+    public PurchaseResult purchaseCart(Cart cart)
     {
         // IN listing_input_id INT,
         // IN listing_buyer_id INT,
         // IN purchase_amount INT
         sqlCode = "CALL buy_listing(?, ?, ?)";
-        try (Connection connection = JDBC.getConnection())
-        {
-            CallableStatement statement = connection.prepareCall(sqlCode);
-            statement.setInt(1, item.getListing().getId());
-            statement.setInt(2, UserSession.getSession().getActiveUser().getAccountID());
-            statement.setInt(3, item.getQuantity());
 
-            statement.execute();
-            UserSession.getSession().setActiveViewListing(null);
-        }
-        catch (Exception e)
+        PurchaseResult result = new PurchaseResult();
+
+        for (CartItem item : new ArrayList<>(cart.getItems()))
         {
-            System.out.println(e);
+            try (Connection connection = JDBC.getConnection())
+            {
+                CallableStatement statement = connection.prepareCall(sqlCode);
+
+                statement.setInt(1, item.getListing().getId());
+                statement.setInt(2, UserSession.getSession().getActiveUser().getAccountID());
+                statement.setInt(3, item.getQuantity());
+
+                statement.execute();
+
+                result.totalCharge += item.getTotal();
+                cart.removeFromCart(item);
+            }
+            catch (SQLException e)
+            {
+                String msg = e.getMessage().toLowerCase();
+
+                result.failedMessages.add(
+                        item.getListing().getName() + ": " + msg
+                );
+            }
         }
+
+        return result;
     }
     //=============================================================================================================
 }
