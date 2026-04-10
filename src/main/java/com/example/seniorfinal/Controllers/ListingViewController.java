@@ -1,6 +1,7 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.CartItem;
+import com.example.seniorfinal.Core.ImageBlob;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.SceneID;
@@ -73,8 +74,7 @@ public class ListingViewController implements Initializable
             errorText.setVisible(true);
             errorText.setText("You Must Select A Purchase Quantity");
         }
-
-
+        goBack();
     }
     //=============================================================================================================
     public void setUpListing()
@@ -87,6 +87,7 @@ public class ListingViewController implements Initializable
         itemDescription.setText(listing.getDescription());
         itemLocation.setText("Location: " + listing.getTown()+", "+listing.getState());
         itemPrice.setText("Price: $" + listing.getPrice());
+        itemImage.setImage(ImageBlob.blobToImage(listing.getListing_image()));
     }
     //=============================================================================================================
     @Override
