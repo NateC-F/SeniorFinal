@@ -7,7 +7,6 @@ import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
@@ -91,7 +90,7 @@ public class ListingEditController implements Initializable
                     statement.setString(2, description);
                     statement.setInt(3, price);
                     statement.setInt(4, quantity);
-                    statement.setInt(5,listing.getId());
+                    statement.setInt(5, listing.getId());
                     statement.executeUpdate();
                     onUpdate.run();
                     ((Stage) nameBox.getScene().getWindow()).close();

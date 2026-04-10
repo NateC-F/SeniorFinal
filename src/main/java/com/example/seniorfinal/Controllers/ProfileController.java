@@ -131,7 +131,7 @@ public class ProfileController implements Initializable
                     }
                     nameLabel.setText(listing.getName());
                     description.setText(listing.getDescription());
-                    price.setText("$"+listing.getPrice());
+                    price.setText("$"+ listing.getPrice());
                     quantity.setText(String.valueOf(listing.getQuantity()));
 
                     setGraphic(layout);

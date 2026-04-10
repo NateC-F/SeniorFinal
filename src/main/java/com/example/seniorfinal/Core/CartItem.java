@@ -34,7 +34,7 @@ public class CartItem
     public void setQuantity(int quantity)
     {
         this.quantity = quantity;
-        total = this.quantity*listing.getPrice();
+        total = this.quantity* listing.getPrice();
     }
 
     public int getTotal()

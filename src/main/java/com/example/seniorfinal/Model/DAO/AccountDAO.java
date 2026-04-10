@@ -1,6 +1,5 @@
 package com.example.seniorfinal.Model.DAO;
 
-import com.example.seniorfinal.Core.Account;
 import com.example.seniorfinal.Core.UserAccount;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.JDBC;
@@ -18,8 +17,7 @@ public class AccountDAO
     private static int id;
     private String sqlCode;
     private PreparedStatement statement;
-    private static Account activeAccount;
-    private static Account listingAccount;
+    private static UserAccount activeAccount;
 
     public AccountDAO(){
         activeAccount = new UserAccount();
@@ -82,10 +80,10 @@ public class AccountDAO
             }
     }
 //=============================================================================================================
-    public ArrayList<Account> getUserAccounts()
+    public ArrayList<UserAccount> getUserAccounts()
     {
         sqlCode = "Select * From user_profile WHERE user_role = 'USER'";
-        ArrayList<Account> accountList = new ArrayList<>();
+        ArrayList<UserAccount> accountList = new ArrayList<>();
 
         try(Connection connection = JDBC.getConnection())
         {

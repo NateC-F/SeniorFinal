@@ -19,7 +19,6 @@ import java.util.ResourceBundle;
 
 public class ListingViewController implements Initializable
 {
-    final String APIKEY = "AIzaSyDcL0ii3auquxDciREAu8QGQM9K1-0bQng";
 
     @FXML
     private ImageView itemImage;
@@ -37,20 +36,6 @@ public class ListingViewController implements Initializable
     private Text errorText;
 
 
-    //=============================================================================================================
-//    @FXML
-//    public void loadMap()
-//    {
-//
-//        double latitude = UserSession.getSession().getActiveViewListing().getLatitude();
-//        double longitude = UserSession.getSession().getActiveViewListing().getLongitude();
-//        int zoomLevel = 15;
-//        String url = String.format("https://maps.googleapis.com/maps/api/staticmap?center=%f,%f&zoom=%d&size=600x400&markers=color:red|%f,%f&key=%s",
-//                                latitude, longitude, zoomLevel, latitude, longitude, URLEncoder.encode(APIKEY, StandardCharsets.UTF_8));
-//
-//        itemMap.setImage(new Image(url));
-//
-//    }
     //=============================================================================================================
     @FXML
     public void goBack()
@@ -80,12 +65,12 @@ public class ListingViewController implements Initializable
     public void setUpListing()
     {
         Listing listing = UserSession.getSession().getActiveViewListing();
-        for (int i=1; i<=listing.getQuantity();i++)
+        for (int i = 1; i<= listing.getQuantity(); i++)
             quantityBox.getItems().add(i);
 
         itemName.setText(listing.getName());
         itemDescription.setText(listing.getDescription());
-        itemLocation.setText("Location: " + listing.getTown()+", "+listing.getState());
+        itemLocation.setText("Location: " + listing.getTown()+", "+ listing.getState());
         itemPrice.setText("Price: $" + listing.getPrice());
         itemImage.setImage(ImageBlob.blobToImage(listing.getListing_image()));
     }

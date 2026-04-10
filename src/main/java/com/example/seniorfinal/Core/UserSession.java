@@ -1,9 +1,13 @@
 package com.example.seniorfinal.Core;
 
+import com.example.seniorfinal.Model.DAO.ListingDAO;
+
+import java.util.ArrayList;
+
 public class UserSession
 {
     private static UserSession session;
-    private Account activeUser;
+    private UserAccount activeUser;
     private Listing userActiveViewListing;
     private Cart userCart;
 
@@ -20,13 +24,13 @@ public class UserSession
         return session;
     }
 
-    public void setActiveUser(Account user)
+    public void setActiveUser(UserAccount user)
     {
         this.activeUser = user;
         userCart = new Cart();
     }
 
-    public Account getActiveUser()
+    public UserAccount getActiveUser()
     {
         return activeUser;
     }
@@ -58,4 +62,11 @@ public class UserSession
     {
         this.userCart = userCart;
     }
+
+    public ArrayList<Order> getOrderHistory()
+    {
+        return new ListingDAO().getOrderHistory();
+    }
+
+
 }

@@ -1,7 +1,5 @@
 package com.example.seniorfinal.Core;
 
-import javafx.scene.image.Image;
-
 import java.sql.Blob;
 import java.sql.Date;
 
@@ -22,7 +20,7 @@ public class Listing
     private int quantity;
     private Blob listing_image;
 
-    public Listing(int id,String name, String description, boolean active, Date startTime, Date endTime, int price,int ownerID, String town, String state, double longitude, double latitude, int quantity, Blob listing_image)
+    public Listing(int id, String name, String description, boolean active, Date startTime, Date endTime, int price, int ownerID, String town, String state, double longitude, double latitude, int quantity, Blob listing_image)
     {
         this.id = id;
         this.name=name;
@@ -125,4 +123,5 @@ public class Listing
     {
         quantity = i;
     }
+
 }

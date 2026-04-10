@@ -1,14 +1,12 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.CartItem;
-import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.PurchaseResult;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
 import com.example.seniorfinal.Utilities.*;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.tax.Registration;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -18,10 +16,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 
 import java.net.URL;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class CheckoutController implements Initializable
@@ -56,15 +50,15 @@ public class CheckoutController implements Initializable
     {
         PurchaseResult result = new ListingDAO().purchaseCart(UserSession.getSession().getUserCart());
         int totalBefore = UserSession.getSession().getUserCart().getCartTotal();
-        if (!result.failedMessages.isEmpty())
+        if (!result.getFailedMessages().isEmpty())
         {
             errorText.setVisible(true);
-            errorText.setText(String.join("\n", result.failedMessages));
+            errorText.setText(String.join("\n", result.getFailedMessages()));
             loadCart();
         }
         try
         {
-            int chargeAmountInt = totalBefore-result.totalCharge;
+            int chargeAmountInt = totalBefore-result.getTotalCharge();
             Long chargeAmountLong = chargeAmountInt *100L;
             PaymentIntent paymentIntent = StripePayment.createPaymentIntent(chargeAmountLong, "usd");
             String clientSecret = paymentIntent.getClientSecret();

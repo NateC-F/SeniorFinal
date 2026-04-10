@@ -10,8 +10,6 @@ import java.util.ArrayList;
 public class ListingDAO
 {
     private String sqlCode;
-    private PreparedStatement statement;
-
 //=============================================================================================================
     public boolean CreateListing(String listingName, String listingDescription, int listingPrice, Date endingDate,
                               String state, String town, double longitude, double latitude, int listingQuantity, int categoryID, Blob listingImage)
@@ -33,7 +31,7 @@ public class ListingDAO
 //      12)IN listing_input_image BLOB
         try(Connection connection = JDBC.getConnection())
         {
-            statement = connection.prepareStatement(sqlCode);
+            PreparedStatement statement = connection.prepareStatement(sqlCode);
             statement.setString(1,listingName);
             statement.setString(2,listingDescription);
             statement.setInt(3, UserSession.getSession().getActiveUser().getAccountID());
@@ -57,41 +55,41 @@ public class ListingDAO
         return true;
     }
     //=============================================================================================================
-    public Listing getListing(int listingID)
-    {
-        sqlCode = "Select * From listing Where listing_id is ?";
-        Listing listing = null;
-        try(Connection connection = JDBC.getConnection())
-        {
-            statement = connection.prepareStatement(sqlCode);
-            statement.setString(1,String.valueOf(listingID));
-
-            ResultSet rs = statement.executeQuery();
-
-            int listing_id = rs.getInt("listing_id");
-            String listing_name = rs.getString("listing_name");
-            String listing_description = rs.getString("listing_description");
-            Date start_date = rs.getDate("listing_start");
-            Date end_date = rs.getDate("listing_end");
-            int listing_price = rs.getInt("listing_price");
-            double longitude = rs.getDouble("listing_longitude");
-            double latitude = rs.getDouble("listing_latitude");
-            String town_name = rs.getString("listing_town");
-            String state = rs.getString("listing_state");
-            int quantity = rs.getInt("listing_quantity");
-            int seller_id = rs.getInt("user_id");
-            Blob listingImage = rs.getBlob("listing_picture");
-            boolean active = true;
-
-            listing = new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                    seller_id,town_name,state,longitude,latitude, quantity,listingImage);
-        }
-        catch (Exception e)
-        {
-
-        }
-        return listing;
-    }
+//    public ActiveListing getListing(int listingID)
+//    {
+//        sqlCode = "Select * From listing Where listing_id is ?";
+//        ActiveListing activeListing = null;
+//        try(Connection connection = JDBC.getConnection())
+//        {
+//            statement = connection.prepareStatement(sqlCode);
+//            statement.setString(1,String.valueOf(listingID));
+//
+//            ResultSet rs = statement.executeQuery();
+//
+//            int listing_id = rs.getInt("listing_id");
+//            String listing_name = rs.getString("listing_name");
+//            String listing_description = rs.getString("listing_description");
+//            Date start_date = rs.getDate("listing_start");
+//            Date end_date = rs.getDate("listing_end");
+//            int listing_price = rs.getInt("listing_price");
+//            double longitude = rs.getDouble("listing_longitude");
+//            double latitude = rs.getDouble("listing_latitude");
+//            String town_name = rs.getString("listing_town");
+//            String state = rs.getString("listing_state");
+//            int quantity = rs.getInt("listing_quantity");
+//            int seller_id = rs.getInt("user_id");
+//            Blob listingImage = rs.getBlob("listing_picture");
+//            boolean active = true;
+//
+//            activeListing = new ActiveListing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
+//                    seller_id,town_name,state,longitude,latitude, quantity,listingImage);
+//        }
+//        catch (Exception e)
+//        {
+//
+//        }
+//        return activeListing;
+//    }
     //=============================================================================================================
     public ArrayList<Listing> getAllActiveListings()
     {
@@ -99,7 +97,7 @@ public class ListingDAO
         ArrayList<Listing> listings = new ArrayList<>();
         try(Connection connection = JDBC.getConnection())
         {
-            statement = connection.prepareStatement(sqlCode);
+            PreparedStatement statement = connection.prepareStatement(sqlCode);
             statement.setInt(1,UserSession.getSession().getActiveUser().getAccountID());
             ResultSet rs = statement.executeQuery();
 
@@ -137,7 +135,7 @@ public class ListingDAO
         ArrayList<Listing> listings = new ArrayList<>();
         try(Connection connection = JDBC.getConnection())
         {
-            statement = connection.prepareStatement(sqlCode);
+            PreparedStatement statement = connection.prepareStatement(sqlCode);
             statement.setInt(1,UserSession.getSession().getActiveUser().getAccountID());
             ResultSet rs = statement.executeQuery();
 
@@ -195,20 +193,51 @@ public class ListingDAO
 
                 statement.execute();
 
-                result.totalCharge += item.getTotal();
+                result.setTotalCharge(item.getTotal() + result.getTotalCharge());
                 cart.removeFromCart(item);
             }
             catch (SQLException e)
             {
-                String msg = e.getMessage().toLowerCase();
-
-                result.failedMessages.add(
-                        item.getListing().getName() + ": " + msg
-                );
+                String errorMsg = e.getMessage().toLowerCase();
+                result.addFailedMessages(item.getListing().getName(),errorMsg);
             }
         }
 
         return result;
+    }
+    //=============================================================================================================
+    public ArrayList<Order> getOrderHistory()
+    {
+        sqlCode = "CALL get_order_history(?)";
+        ArrayList<Order> orderHistory = new ArrayList<>();
+        try (Connection connection = JDBC.getConnection())
+        {
+            CallableStatement statement = connection.prepareCall(sqlCode);
+            statement.setInt(1,UserSession.getSession().getActiveUser().getAccountID());
+            statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+
+            while(resultSet.next())
+            {
+                Date date = resultSet.getDate("purchase_date");
+                int quantity = resultSet.getInt("purchase_quantity");
+                int price = resultSet.getInt("purchase_price");
+                String name = resultSet.getString("listing_name");
+                String sellerName = resultSet.getString("seller_name");
+                double lat = resultSet.getDouble("listing_latitude");
+                double lon = resultSet.getDouble("listing_longitude");
+
+                String[] addr = new Location().convertLongAndLatToAddr(lat,lon);
+                ListingReceipt receipt = new ListingReceipt(name,date,price,lon,lat,addr[1],addr[0],quantity);
+
+                orderHistory.add(new Order(receipt,sellerName));
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return orderHistory;
     }
     //=============================================================================================================
 }
