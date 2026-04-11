@@ -1,12 +1,18 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Model.DAO.AccountDAO;
+import com.example.seniorfinal.Utilities.DuplicateAccountException;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
-public class CreateAccountController
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class CreateAccountController implements Initializable
 {
     @FXML
     private TextField nameField;
@@ -14,28 +20,108 @@ public class CreateAccountController
     @FXML
     private TextField passField;
     @FXML
+    private TextField passField2;
+    @FXML
     private Text accountCreateFlag;
+    @FXML
+    private Text succsessText;
+    @FXML
+    private ProgressBar passwordStrengthBar;
+    @FXML
+    private Text strengthText;
+
+    private int score = 0;
+    private boolean length = false;
+    private boolean number = false;
+    private boolean specialChar = false;
 
     private AccountDAO accountDAO = new AccountDAO();
 
     //=============================================================================================================
-
     @FXML
     private void createAccount()
     {
         String username = nameField.getText().trim();
         String password = passField.getText().trim();
-        if (accountDAO.createAccount(username,password))
+        String matchingPass = passField2.getText().trim();
+        succsessText.setVisible(false);
+
+        if (!password.equals(matchingPass))
         {
-            accountCreateFlag.setFill(Color.GREEN);
-            accountCreateFlag.setText("ACCOUNT CREATED YOU MAY CLOSE THIS TAB");
+            accountCreateFlag.setText("Passwords do not match");
+            return;
         }
-        else {
-            accountCreateFlag.setFill(Color.RED);
-            accountCreateFlag.setText("ACCOUNT COULD NOT BE CREATED");
+        if (score < 3)
+        {
+            accountCreateFlag.setText("Password is not strong enough");
+            return;
         }
-
-        accountCreateFlag.setVisible(true);
+        try
+        {
+            accountDAO.createAccount(username, password);
+            accountCreateFlag.setText("");
+            succsessText.setVisible(true);
+            passField.clear();
+            passField2.clear();
+            nameField.clear();
+            length = false;
+            number = false;
+            specialChar = false;
+            score = 0;
+        }
+        catch (DuplicateAccountException e)
+        {
+            accountCreateFlag.setText(e.getMessage());
+        }
+        catch (Exception e)
+        {
+            accountCreateFlag.setText("Error creating account, try again later");
+        }
     }
+    //=============================================================================================================
+    private void updatePasswordStrength(String password)
+    {
+        int score = 0;
 
+        length = password.length() >= 8;
+        number = password.matches(".*\\d.*");
+        specialChar = password.matches(".*[!@#$%^&*()].*");
+
+        if (length) score++;
+        if (number) score++;
+        if (specialChar) score++;
+
+        double progress = score / 3.0;
+        passwordStrengthBar.setProgress(progress);
+
+        if (score == 1)
+        {
+            passwordStrengthBar.setStyle("-fx-accent: red;");
+            strengthText.setText("Weak password");
+        }
+        else if (score == 2)
+        {
+            passwordStrengthBar.setStyle("-fx-accent: orange;");
+            strengthText.setText("Medium password");
+        }
+        else if (score == 3)
+        {
+            passwordStrengthBar.setStyle("-fx-accent: green;");
+            strengthText.setText("Strong password");
+        }
+        else
+        {
+            passwordStrengthBar.setStyle("-fx-accent: red;");
+            strengthText.setText("Too weak");
+        }
+    }
+    //=============================================================================================================
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle)
+    {
+        passField.textProperty().addListener((obs, oldVal, newVal) -> {
+            updatePasswordStrength(newVal);
+        });
+        strengthText.setText("Too weak");
+    }
 }

@@ -2,12 +2,14 @@ package com.example.seniorfinal.Model.DAO;
 
 import com.example.seniorfinal.Core.UserAccount;
 import com.example.seniorfinal.Core.UserSession;
+import com.example.seniorfinal.Utilities.DuplicateAccountException;
 import com.example.seniorfinal.Utilities.JDBC;
 import com.example.seniorfinal.Utilities.PasswordHash;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -36,10 +38,14 @@ public class AccountDAO
             int rows = statement.executeUpdate();
             return rows > 0;
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
-            System.out.println(e);
-            return false;
+            // 23000 = integrity constraint violation (duplicate key, etc.)
+            if ("23000".equals(e.getSQLState()))
+            {
+                throw new DuplicateAccountException("Username '" + accountName + "' already exists");
+            }
+            throw new RuntimeException("Database error: " + e.getMessage());
         }
     }
 //=============================================================================================================
