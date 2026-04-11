@@ -51,7 +51,7 @@ public class CreateAccountController implements Initializable
             accountCreateFlag.setText("Passwords do not match");
             return;
         }
-        if (score < 3)
+        if (score != 3)
         {
             accountCreateFlag.setText("Password is not strong enough");
             return;
@@ -81,33 +81,39 @@ public class CreateAccountController implements Initializable
     //=============================================================================================================
     private void updatePasswordStrength(String password)
     {
-        int score = 0;
-
+        int tempScore=0;
         length = password.length() >= 8;
         number = password.matches(".*\\d.*");
         specialChar = password.matches(".*[!@#$%^&*()].*");
 
-        if (length) score++;
-        if (number) score++;
-        if (specialChar) score++;
+        if (length)
+            tempScore++;
 
-        double progress = score / 3.0;
+        if (number)
+            tempScore++;
+
+        if (specialChar)
+            tempScore++;
+
+
+        double progress = tempScore / 3.0;
         passwordStrengthBar.setProgress(progress);
 
-        if (score == 1)
+        if (tempScore == 1)
         {
             passwordStrengthBar.setStyle("-fx-accent: red;");
             strengthText.setText("Weak password");
         }
-        else if (score == 2)
+        else if (tempScore == 2)
         {
             passwordStrengthBar.setStyle("-fx-accent: orange;");
             strengthText.setText("Medium password");
         }
-        else if (score == 3)
+        else if (tempScore == 3)
         {
             passwordStrengthBar.setStyle("-fx-accent: green;");
             strengthText.setText("Strong password");
+            score = tempScore;
         }
         else
         {
