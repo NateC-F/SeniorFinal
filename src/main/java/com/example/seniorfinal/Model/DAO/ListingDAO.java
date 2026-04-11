@@ -190,7 +190,7 @@ public class ListingDAO
         }
     }
     //=============================================================================================================
-    public PurchaseResult purchaseCart(Cart cart)
+    public PurchaseResult purchaseCart(Cart cart) throws SQLException
     {
         // IN listing_input_id INT,
         // IN listing_buyer_id INT,
@@ -199,25 +199,27 @@ public class ListingDAO
 
         PurchaseResult result = new PurchaseResult();
 
-        for (CartItem item : new ArrayList<>(cart.getItems()))
+        try (Connection connection = JDBC.getConnection())
         {
-            try (Connection connection = JDBC.getConnection())
+            CallableStatement statement = connection.prepareCall(sqlCode);
+
+            for (CartItem item : new ArrayList<>(cart.getItems()))
             {
-                CallableStatement statement = connection.prepareCall(sqlCode);
+                try
+                {
+                    statement.setInt(1, item.getListing().getId());
+                    statement.setInt(2, UserSession.getSession().getActiveUser().getAccountID());
+                    statement.setInt(3, item.getQuantity());
 
-                statement.setInt(1, item.getListing().getId());
-                statement.setInt(2, UserSession.getSession().getActiveUser().getAccountID());
-                statement.setInt(3, item.getQuantity());
+                    statement.executeUpdate();
 
-                statement.execute();
-
-                result.setTotalCharge(item.getTotal() + result.getTotalCharge());
-                cart.removeFromCart(item);
-            }
-            catch (SQLException e)
-            {
-                String errorMsg = e.getMessage().toLowerCase();
-                result.addFailedMessages(item.getListing().getName(),errorMsg);
+                    result.setTotalCharge(item.getTotal() + result.getTotalCharge());
+                    cart.removeFromCart(item);
+                }
+                catch (SQLException e)
+                {
+                    result.addFailedMessages(item.getListing().getName(), e.getMessage().toLowerCase());
+                }
             }
         }
 

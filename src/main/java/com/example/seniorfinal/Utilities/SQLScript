@@ -224,12 +224,13 @@ BEGIN
     DECLARE is_active BOOLEAN;
     DECLARE current_quantity INT;
     DECLARE total_price INT;
+    START TRANSACTION;
 
-	START TRANSACTION;
     SELECT user_id, listing_price, listing_active, listing_quantity
     INTO seller_variable_id, selling_price, is_active, current_quantity
     FROM listing
-    WHERE listing_id = listing_input_id;
+    WHERE listing_id = listing_input_id
+    FOR UPDATE;
 
     IF seller_variable_id IS NULL THEN
         SIGNAL SQLSTATE '45000'
@@ -246,18 +247,32 @@ BEGIN
         SET MESSAGE_TEXT = 'Not enough quantity available';
     END IF;
 
-    SET total_price = selling_price*purchase_amount;
-    INSERT INTO order_history(listing_id, buyer_id, seller_id, purchase_price, purchase_quantity)
-    VALUES (listing_input_id, listing_buyer_id, seller_variable_id, total_price, purchase_amount);
+    SET total_price = selling_price * purchase_amount;
+
+    INSERT INTO order_history(
+        listing_id,
+        buyer_id,
+        seller_id,
+        purchase_price,
+        purchase_quantity
+    )
+    VALUES (
+        listing_input_id,
+        listing_buyer_id,
+        seller_variable_id,
+        total_price,
+        purchase_amount
+    );
 
     UPDATE listing
     SET
         listing_quantity = listing_quantity - purchase_amount,
         listing_active = CASE
-            WHEN listing_quantity <= 0 THEN FALSE
+            WHEN listing_quantity - purchase_amount <= 0 THEN FALSE
             ELSE listing_active
         END
     WHERE listing_id = listing_input_id;
+    COMMIT;
 
 END //
 DELIMITER ;

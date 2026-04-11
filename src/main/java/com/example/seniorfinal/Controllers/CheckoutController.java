@@ -16,6 +16,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 public class CheckoutController implements Initializable
@@ -46,10 +47,11 @@ public class CheckoutController implements Initializable
 
     //=============================================================================================================
     @FXML
-    public void purchase()
+    public void purchase() throws SQLException
     {
         PurchaseResult result = new ListingDAO().purchaseCart(UserSession.getSession().getUserCart());
-        int totalBefore = UserSession.getSession().getUserCart().getCartTotal();
+        int totalBefore = result.getTotalCharge();
+
         if (!result.getFailedMessages().isEmpty())
         {
             errorText.setVisible(true);
