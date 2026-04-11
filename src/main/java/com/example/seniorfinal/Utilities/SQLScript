@@ -223,6 +223,7 @@ BEGIN
     DECLARE selling_price INT;
     DECLARE is_active BOOLEAN;
     DECLARE current_quantity INT;
+    DECLARE total_price INT;
 
 	START TRANSACTION;
     SELECT user_id, listing_price, listing_active, listing_quantity
@@ -245,8 +246,9 @@ BEGIN
         SET MESSAGE_TEXT = 'Not enough quantity available';
     END IF;
 
+    SET total_price = selling_price*purchase_amount;
     INSERT INTO order_history(listing_id, buyer_id, seller_id, purchase_price, purchase_quantity)
-    VALUES (listing_input_id, listing_buyer_id, seller_variable_id, selling_price, purchase_amount);
+    VALUES (listing_input_id, listing_buyer_id, seller_variable_id, total_price, purchase_amount);
 
     UPDATE listing
     SET
@@ -269,7 +271,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
 -- Gets Order History
 DELIMITER //
 CREATE PROCEDURE get_order_history(IN p_buyer_id INT)
@@ -278,11 +279,39 @@ BEGIN
         o.purchase_date,
         o.purchase_price,
         o.purchase_quantity,
-
         l.listing_name,
         l.listing_latitude,
         l.listing_longitude,
+        seller.user_name AS seller_name,
+        buyer.user_name AS buyer_name
 
+    FROM order_history o
+    JOIN listing l
+        ON o.listing_id = l.listing_id
+
+    JOIN user_profile seller
+        ON o.seller_id = seller.user_id
+
+    JOIN user_profile buyer
+        ON o.buyer_id = buyer.user_id
+
+    WHERE o.buyer_id = p_buyer_id
+    ORDER BY o.purchase_date DESC;
+END //
+DELIMITER ;
+
+-- Gets Sale History
+DELIMITER //
+CREATE PROCEDURE get_sale_history(IN p_seller_id INT)
+BEGIN
+    SELECT
+        o.purchase_date,
+        o.purchase_price,
+        o.purchase_quantity,
+        l.listing_name,
+        l.listing_latitude,
+        l.listing_longitude,
+        buyer.user_name AS buyer_name,
         seller.user_name AS seller_name
 
     FROM order_history o
@@ -292,11 +321,13 @@ BEGIN
     JOIN user_profile seller
         ON o.seller_id = seller.user_id
 
-    WHERE o.buyer_id = p_buyer_id
+    JOIN user_profile buyer
+        ON o.buyer_id = buyer.user_id
+
+    WHERE o.seller_id = p_seller_id
     ORDER BY o.purchase_date DESC;
 END //
 DELIMITER ;
-
 
 -- ============================
 --         TABLE INDEXES
