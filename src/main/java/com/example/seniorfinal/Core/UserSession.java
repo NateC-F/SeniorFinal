@@ -63,9 +63,14 @@ public class UserSession
         this.userCart = userCart;
     }
 
-    public ArrayList<Order> getOrderHistory()
+    public ArrayList<ListingReceipt> getOrderHistory()
     {
-        return new ListingDAO().getOrderHistory();
+        return new ListingDAO().getOrderHistory(getActiveUser().getAccountID());
+    }
+
+    public ArrayList<ListingReceipt> getSaleHistory()
+    {
+        return new ListingDAO().getSaleHistory(getActiveUser().getAccountID());
     }
 
 

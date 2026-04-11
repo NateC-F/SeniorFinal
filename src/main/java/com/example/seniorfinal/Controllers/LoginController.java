@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LoginController
@@ -75,7 +76,8 @@ public class LoginController
             String css = getClass().getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm();
             scene.getStylesheets().add(css);
             newStage.setScene(scene);
-            newStage.show();
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
         }

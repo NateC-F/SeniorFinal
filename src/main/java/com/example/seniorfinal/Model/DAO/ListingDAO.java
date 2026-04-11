@@ -155,9 +155,9 @@ public class ListingDAO
                 int seller_id = rs.getInt("user_id");
                 Blob listingImage = rs.getBlob("listing_picture");
                 boolean active =rs.getBoolean("listing_active");
-
-                listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                        seller_id,town_name,state,longitude,latitude, quantity,listingImage));
+                if (active)
+                    listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
+                            seller_id,town_name,state,longitude,latitude, quantity,listingImage));
             }
         }
         catch (Exception e)
@@ -169,7 +169,25 @@ public class ListingDAO
     //=============================================================================================================
     public void deleteListing(int listingID)
     {
-        sqlCode = "CALL delete_listing("+ listingID + ")";
+        sqlCode = "CALL delete_listing(?)";
+        try(Connection connection = JDBC.getConnection())
+        {
+            CallableStatement statement = connection.prepareCall(sqlCode);
+            statement.setInt(1,listingID);
+            int rows = statement.executeUpdate();
+
+            if (rows == 0)
+            {
+                throw new RuntimeException("Listing not found or already deleted");
+            }
+        }
+        catch (SQLException e)
+        {
+            String msg = e.getMessage();
+
+            if (msg.contains("does not exist"))
+                throw new ListingNotFoundException("Listing does not exist. Please refresh.");
+        }
     }
     //=============================================================================================================
     public PurchaseResult purchaseCart(Cart cart)
@@ -206,14 +224,14 @@ public class ListingDAO
         return result;
     }
     //=============================================================================================================
-    public ArrayList<Order> getOrderHistory()
+    public ArrayList<ListingReceipt> getSaleHistory(int seller_id)
     {
-        sqlCode = "CALL get_order_history(?)";
-        ArrayList<Order> orderHistory = new ArrayList<>();
+        sqlCode = "CALL get_sale_history(?)";
+        ArrayList<ListingReceipt> saleHistory = new ArrayList<>();
         try (Connection connection = JDBC.getConnection())
         {
             CallableStatement statement = connection.prepareCall(sqlCode);
-            statement.setInt(1,UserSession.getSession().getActiveUser().getAccountID());
+            statement.setInt(1,seller_id);
             statement.execute();
             ResultSet resultSet = statement.getResultSet();
 
@@ -222,15 +240,52 @@ public class ListingDAO
                 Date date = resultSet.getDate("purchase_date");
                 int quantity = resultSet.getInt("purchase_quantity");
                 int price = resultSet.getInt("purchase_price");
-                String name = resultSet.getString("listing_name");
+                String listingName = resultSet.getString("listing_name");
+                String buyerName = resultSet.getString("buyer_name");
+                String sellerName = UserSession.getSession().getActiveUser().getAccountName();
+                double lat = resultSet.getDouble("listing_latitude");
+                double lon = resultSet.getDouble("listing_longitude");
+                String[] addr = new Location().convertLongAndLatToAddr(lat,lon);
+
+                ListingReceipt receipt = new ListingReceipt(listingName,date,price,lon,lat,addr[1],addr[0],quantity,sellerName,buyerName);
+
+                saleHistory.add(receipt);
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return saleHistory;
+    }
+    //=============================================================================================================
+    public ArrayList<ListingReceipt> getOrderHistory(int buyer_id)
+    {
+        sqlCode = "CALL get_order_history(?)";
+        ArrayList<ListingReceipt> orderHistory = new ArrayList<>();
+        try (Connection connection = JDBC.getConnection())
+        {
+            CallableStatement statement = connection.prepareCall(sqlCode);
+            statement.setInt(1,buyer_id);
+            statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+
+            while(resultSet.next())
+            {
+                Date date = resultSet.getDate("purchase_date");
+                int quantity = resultSet.getInt("purchase_quantity");
+                int price = resultSet.getInt("purchase_price");
+                String listingName = resultSet.getString("listing_name");
                 String sellerName = resultSet.getString("seller_name");
                 double lat = resultSet.getDouble("listing_latitude");
                 double lon = resultSet.getDouble("listing_longitude");
+                String buyerName = UserSession.getSession().getActiveUser().getAccountName();
+
 
                 String[] addr = new Location().convertLongAndLatToAddr(lat,lon);
-                ListingReceipt receipt = new ListingReceipt(name,date,price,lon,lat,addr[1],addr[0],quantity);
+                ListingReceipt receipt = new ListingReceipt(listingName,date,price,lon,lat,addr[1],addr[0],quantity,sellerName,buyerName);
 
-                orderHistory.add(new Order(receipt,sellerName));
+                orderHistory.add(receipt);
             }
         }
         catch (Exception e)

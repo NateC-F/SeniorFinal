@@ -5,20 +5,23 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.OrderHistoryController">
    <children>
       <Button layoutX="1207.0" layoutY="14.0" mnemonicParsing="false" onAction="#goBack" text="go back" />
-      <TableView fx:id="orderTable" layoutX="15.0" layoutY="86.0" prefHeight="632.0" prefWidth="1210.0">
+      <TableView fx:id="orderTable" layoutX="15.0" layoutY="86.0" prefHeight="632.0" prefWidth="1200.0">
         <columns>
-          <TableColumn fx:id="name" prefWidth="75.0" text="Listing Name" />
-          <TableColumn fx:id="date" prefWidth="75.0" text="Sale Date" />
-            <TableColumn fx:id="seller" prefWidth="75.0" text="Seller Name" />
-            <TableColumn fx:id="price" prefWidth="75.0" text="Sale Amount" />
-            <TableColumn fx:id="amount" prefWidth="75.0" text="Sale Quantity" />
-            <TableColumn fx:id="location" prefWidth="75.0" text="Location" />
+          <TableColumn fx:id="listingName" prefWidth="200.0" text="Listing Name" />
+          <TableColumn fx:id="saleDate" prefWidth="200.0" text="Sale Date" />
+            <TableColumn fx:id="sellerName" prefWidth="200.0" text="Seller Name" />
+            <TableColumn fx:id="salePrice" prefWidth="200.0" text="Sale Amount" />
+            <TableColumn fx:id="quantity" prefWidth="200.0" text="Sale Quantity" />
+            <TableColumn fx:id="location" prefWidth="200.0" text="Location" />
         </columns>
       </TableView>
-      <Label layoutX="66.0" layoutY="18.0" text="Order History" />
+      <Label layoutX="66.0" layoutY="18.0" text="Purchase History" />
+      <Button layoutX="1001.0" layoutY="14.0" mnemonicParsing="false" onAction="#createReceipt" text="Create Purchase History Receipt" />
+      <Text fx:id="errorText" fill="RED" layoutX="15.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" />
    </children>
 </AnchorPane>

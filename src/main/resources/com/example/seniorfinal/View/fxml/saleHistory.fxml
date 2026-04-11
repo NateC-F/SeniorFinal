@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="430.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.SaleHistoryController">
+   <children>
+      <TableView fx:id="orderTable" layoutY="30.0" prefHeight="400.0" prefWidth="600.0">
+        <columns>
+          <TableColumn fx:id="listingName" prefWidth="120.0" text="Item Name" />
+          <TableColumn fx:id="saleDate" prefWidth="120.0" text="Sale Date" />
+            <TableColumn fx:id="buyerName" prefWidth="120.0" text="Buyer Name" />
+            <TableColumn fx:id="salePrice" prefWidth="120.0" text="Sale Price" />
+            <TableColumn fx:id="quantity" prefWidth="120.0" text="Sale Quantity" />
+        </columns>
+      </TableView>
+      <Button layoutY="2.0" mnemonicParsing="false" onAction="#createReceipt" text="Create Sale History Receipt" />
+      <Text fx:id="errorText" fill="RED" layoutX="210.0" layoutY="19.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" />
+   </children>
+</AnchorPane>

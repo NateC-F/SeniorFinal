@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
@@ -9,39 +10,71 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-
-<AnchorPane prefHeight="460.0" prefWidth="640.0"  xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.ListingEditController">
+<AnchorPane prefHeight="258.0" prefWidth="452.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.ListingEditController">
    <children>
       <VBox prefHeight="258.0" prefWidth="640.0">
          <children>
-            <HBox prefHeight="27.0" prefWidth="640.0">
+            <HBox prefHeight="30.0" prefWidth="640.0">
                <children>
-                  <Label text="Update Name" />
+                  <Label text="Update Name">
+                     <HBox.margin>
+                        <Insets right="34.0" top="5.0" />
+                     </HBox.margin></Label>
                   <TextField fx:id="nameBox" promptText="Enter New Name..." />
                </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
             </HBox>
-            <HBox prefHeight="28.0" prefWidth="640.0">
+            <HBox prefHeight="30.0" prefWidth="640.0">
                <children>
-                  <Label text="Update Description" />
-                  <TextArea fx:id="descriptionBox" prefHeight="49.0" prefWidth="200.0" promptText="Enter New Description..." />
+                  <Label text="Update Description">
+                     <HBox.margin>
+                        <Insets right="5.0" top="5.0" />
+                     </HBox.margin></Label>
+                  <TextArea fx:id="descriptionBox" prefHeight="30.0" prefWidth="200.0" promptText="Enter New Description..." />
                </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
             </HBox>
-            <HBox prefHeight="40.0" prefWidth="640.0">
+            <HBox prefHeight="30.0" prefWidth="640.0">
                <children>
-                  <Label text="Update Price" />
-                  <TextField fx:id="priceBox" promptText="Enter New Price..." />
+                  <Label text="Update Price">
+                     <HBox.margin>
+                        <Insets right="40.0" top="5.0" />
+                     </HBox.margin></Label>
+                  <TextField fx:id="priceBox" promptText="Enter New Price...">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></TextField>
                </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
             </HBox>
-            <HBox prefHeight="25.0" prefWidth="640.0">
+            <HBox prefHeight="30.0" prefWidth="640.0">
                <children>
-                  <Label text="Update Quantity" />
+                  <Label text="Update Quantity">
+                     <HBox.margin>
+                        <Insets right="20.0" top="5.0" />
+                     </HBox.margin></Label>
                   <TextField fx:id="quantityBox" promptText="Enter new Quantity..." />
                </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
             </HBox>
          </children>
       </VBox>
-      <Button layoutX="26.0" layoutY="366.0" mnemonicParsing="false" onAction="#makeChanges" text="Confirm Changes" />
-      <Button layoutX="26.0" layoutY="405.0" mnemonicParsing="false" onAction="#goBack" text="Cancel Changes" />
-      <Text fx:id="errorText" fill="RED" layoutX="365.0" layoutY="422.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+      <Button layoutX="10.0" layoutY="150.0" mnemonicParsing="false" onAction="#makeChanges" text="Confirm Changes" />
+      <Button layoutX="10.0" layoutY="180.0" mnemonicParsing="false" onAction="#goBack" text="Cancel Changes" />
+      <Text fx:id="errorText" fill="RED" layoutX="125.0" layoutY="170.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" />
    </children>
 </AnchorPane>

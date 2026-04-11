@@ -1,7 +1,6 @@
 module com.example.seniorfinal {
     requires javafx.fxml;
     requires mysql.connector.j;
-    requires java.sql;
     requires jbcrypt;
     requires com.google.common;
     requires com.google.protobuf;
@@ -10,6 +9,8 @@ module com.example.seniorfinal {
     requires java.net.http;
     requires javafx.swing;
     requires com.stripe;
+    requires com.google.gson;
+    requires java.sql;
 
 
     opens com.example.seniorfinal to javafx.fxml;
@@ -21,5 +22,5 @@ module com.example.seniorfinal {
     exports com.example.seniorfinal.Utilities;
     opens com.example.seniorfinal.Utilities to javafx.fxml;
     exports com.example.seniorfinal.Core;
-    opens com.example.seniorfinal.Core to javafx.fxml;
+    opens com.example.seniorfinal.Core to javafx.fxml, com.google.gson;
 }

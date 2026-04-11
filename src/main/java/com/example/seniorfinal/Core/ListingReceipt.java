@@ -4,35 +4,51 @@ import java.sql.Date;
 
 public class ListingReceipt
 {
-    private String name;
-    private Date endTime;
+    private String listingName;
+    private String sellerName;
+    private String buyerName;
+    private Date saleDate;
     private int salePrice;
-    private double longitude;
-    private double latitude;
-    private String state;
-    private String town;
     private int quantity;
+    private String town;
+    private String state;
+    private String location;
+    private double latitude;
+    private double longitude;
 
-    public ListingReceipt(String name, Date endTime, int salePrice, double longitude, double latitude, String state, String town, int quantity)
+    public ListingReceipt(String listingName, Date saleDate, int salePrice, double longitude, double latitude, String state, String town, int quantity, String sellerName, String buyerName)
     {
-        this.name = name;
-        this.endTime = endTime;
+        this.listingName = listingName;
+        this.saleDate = saleDate;
         this.salePrice = salePrice;
         this.longitude = longitude;
         this.latitude = latitude;
         this.state = state;
         this.town = town;
         this.quantity = quantity;
+        this.sellerName = sellerName;
+        this.buyerName = buyerName;
+        location = town + ", " + state;
     }
 
-    public String getName()
+    public String getListingName()
     {
-        return name;
+        return listingName;
     }
 
-    public Date getEndTime()
+    public void setListingName(String listingName)
     {
-        return endTime;
+        this.listingName = listingName;
+    }
+
+    public Date getSaleDate()
+    {
+        return saleDate;
+    }
+
+    public void setSaleDate(Date saleDate)
+    {
+        this.saleDate = saleDate;
     }
 
     public int getSalePrice()
@@ -40,9 +56,19 @@ public class ListingReceipt
         return salePrice;
     }
 
+    public void setSalePrice(int salePrice)
+    {
+        this.salePrice = salePrice;
+    }
+
     public double getLongitude()
     {
         return longitude;
+    }
+
+    public void setLongitude(double longitude)
+    {
+        this.longitude = longitude;
     }
 
     public double getLatitude()
@@ -50,14 +76,29 @@ public class ListingReceipt
         return latitude;
     }
 
+    public void setLatitude(double latitude)
+    {
+        this.latitude = latitude;
+    }
+
     public String getState()
     {
         return state;
     }
 
+    public void setState(String state)
+    {
+        this.state = state;
+    }
+
     public String getTown()
     {
         return town;
+    }
+
+    public void setTown(String town)
+    {
+        this.town = town;
     }
 
     public int getQuantity()
@@ -68,5 +109,35 @@ public class ListingReceipt
     public void setQuantity(int quantity)
     {
         this.quantity = quantity;
+    }
+
+    public String getSellerName()
+    {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName)
+    {
+        this.sellerName = sellerName;
+    }
+
+    public String getBuyerName()
+    {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName)
+    {
+        this.buyerName = buyerName;
+    }
+
+    public String getLocation()
+    {
+        return location;
+    }
+
+    public void setLocation(String location)
+    {
+        this.location = location;
     }
 }

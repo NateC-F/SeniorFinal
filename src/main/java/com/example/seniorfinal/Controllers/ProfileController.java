@@ -14,8 +14,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -34,6 +36,20 @@ public class ProfileController implements Initializable
         SceneManager.switchTo(SceneID.OrderHistoryScreen);
     }
     //=============================================================================================================
+    public void openSaleHistory() throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/seniorfinal/View/fxml/saleHistory.fxml"));
+        Parent root = loader.load();
+        SaleHistoryController controller = loader.getController();
+        Stage newStage = new Stage();
+        newStage.setTitle("Sale History");
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm());
+        newStage.setScene(scene);
+        newStage.initModality(Modality.APPLICATION_MODAL);
+        newStage.showAndWait();
+    }
+    // =============================================================================================================
     public void pullOwnListings()
     {
         userListings.getItems().clear();
@@ -53,7 +69,8 @@ public class ProfileController implements Initializable
             String css = getClass().getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm();
             scene.getStylesheets().add(css);
             newStage.setScene(scene);
-            newStage.show();
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,12 +140,6 @@ public class ProfileController implements Initializable
                 } else {
                     if (listing.getActive())
                         statusLabel.setText("Active Listing");
-                    else
-                    {
-                        statusLabel.setText("Item Sold");
-                        editButton.setVisible(false);
-                        deleteButton.setVisible(false);
-                    }
                     nameLabel.setText(listing.getName());
                     description.setText(listing.getDescription());
                     price.setText("$"+ listing.getPrice());
