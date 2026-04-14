@@ -112,13 +112,13 @@ public class CreateAccountController implements Initializable
         {
             passwordStrengthBar.setStyle("-fx-accent: green;");
             strengthText.setText("Strong password");
-            score = tempScore;
         }
         else
         {
             passwordStrengthBar.setStyle("-fx-accent: red;");
             strengthText.setText("Too weak");
         }
+        score = tempScore;
     }
     //=============================================================================================================
     @Override

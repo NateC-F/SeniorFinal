@@ -1,6 +1,5 @@
 package com.example.seniorfinal;
 
-import com.example.seniorfinal.Utilities.JDBC;
 import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
 import com.example.seniorfinal.Utilities.StripeConfig;

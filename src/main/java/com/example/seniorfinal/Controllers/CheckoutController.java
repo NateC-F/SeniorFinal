@@ -60,7 +60,11 @@ public class CheckoutController implements Initializable
         }
         try
         {
-            int chargeAmountInt = totalBefore-result.getTotalCharge();
+            int chargeAmountInt = 0;
+            if (totalBefore-result.getTotalCharge() == 0)
+                chargeAmountInt = totalBefore;
+            else
+                chargeAmountInt = totalBefore-result.getTotalCharge();
             Long chargeAmountLong = chargeAmountInt *100L;
             PaymentIntent paymentIntent = StripePayment.createPaymentIntent(chargeAmountLong, "usd");
             String clientSecret = paymentIntent.getClientSecret();
