@@ -2,7 +2,7 @@ package com.example.seniorfinal.Core;
 
 import java.time.LocalDate;
 
-public class UserAccount
+public class UserAccount implements ListViewItem
 {
     private String accountName;
     private int accountID;

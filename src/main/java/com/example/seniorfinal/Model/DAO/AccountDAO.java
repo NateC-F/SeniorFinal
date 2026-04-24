@@ -86,6 +86,21 @@ public class AccountDAO
             }
     }
 //=============================================================================================================
+    public void deleteAccount(int accountID)
+    {
+        sqlCode = "DELETE FROM user_profile WHERE user_id = ?";
+        try (Connection connection = JDBC.getConnection())
+        {
+            statement = connection.prepareStatement(sqlCode);
+            statement.setInt(1,accountID);
+            statement.executeUpdate();
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+//=============================================================================================================
     public ArrayList<UserAccount> getUserAccounts()
     {
         sqlCode = "Select * From user_profile WHERE user_role = 'USER'";

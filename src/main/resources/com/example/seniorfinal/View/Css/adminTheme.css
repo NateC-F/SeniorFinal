@@ -30,6 +30,23 @@
     -fx-cursor: hand;
 }
 
+.menu-button{
+    -fx-background-color: #FF4C4C;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 6 12 6 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.menu-item{
+    -fx-background-color: #FF4C4C;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 6 12 6 12;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
 .button:hover {
     -fx-background-color: #E03A3A; /* Darker red on hover */
 }

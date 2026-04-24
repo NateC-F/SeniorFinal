@@ -2,8 +2,9 @@ package com.example.seniorfinal.Core;
 
 import java.sql.Blob;
 import java.sql.Date;
+import java.util.List;
 
-public class Listing
+public class Listing implements ListViewItem
 {
     private int id;
     private String name;
