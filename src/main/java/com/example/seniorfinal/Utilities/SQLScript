@@ -383,13 +383,5 @@ From listing;
 Select *
 from order_history;
 
-UPDATE listing
-SET listing_quantity = 10
-WHERE listing_id = 5;
-
-UPDATE listing
-SET listing_active = true
-WHERE listing_id = 5;
-
 INSERT INTO user_profile (user_name, user_pass, user_role)
 VALUES ('admin', '$2a$10$3Fa2OzaAW/FM3.y4GUIO9eT2jBqYqg5c18KAQwCWDEW1XgDJV8/yu', 'ADMIN'); -- this is 1234
