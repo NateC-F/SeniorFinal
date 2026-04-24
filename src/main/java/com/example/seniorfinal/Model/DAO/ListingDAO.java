@@ -118,9 +118,10 @@ public class ListingDAO
                 int seller_id = rs.getInt("user_id");
                 Blob listingImage = rs.getBlob("listing_picture");
                 boolean active =true;
+                Category category = new Category(new CategoryDAO().getCategory(listing_id));
 
                 listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                        seller_id,town_name,state,longitude,latitude, quantity,listingImage));
+                        seller_id,town_name,state,longitude,latitude, quantity,listingImage,category));
             }
         }
         catch (Exception e)
@@ -156,9 +157,11 @@ public class ListingDAO
                 int seller_id = rs.getInt("user_id");
                 Blob listingImage = rs.getBlob("listing_picture");
                 boolean active =rs.getBoolean("listing_active");
+                Category category = new Category(new CategoryDAO().getCategory(listing_id));
+
                 if (active)
                     listings.add(new Listing(listing_id,listing_name,listing_description,active,start_date,end_date,listing_price,
-                            seller_id,town_name,state,longitude,latitude, quantity,listingImage));
+                            seller_id,town_name,state,longitude,latitude, quantity,listingImage, category));
             }
         }
         catch (Exception e)

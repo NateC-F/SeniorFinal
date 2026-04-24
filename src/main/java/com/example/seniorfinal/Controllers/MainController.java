@@ -1,8 +1,10 @@
 package com.example.seniorfinal.Controllers;
 
+import com.example.seniorfinal.Core.Category;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.ImageBlob;
 import com.example.seniorfinal.Core.UserSession;
+import com.example.seniorfinal.Model.DAO.CategoryDAO;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
 import com.example.seniorfinal.Utilities.SceneID;
 import com.example.seniorfinal.Utilities.SceneManager;
@@ -22,11 +24,11 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable
 {
     @FXML
-    private Text welcomeText;
-    @FXML
-    private Text cartText;
-    @FXML
     ListView<Listing> listingHolder;
+    @FXML
+    MenuButton filter;
+
+    private java.util.List<Listing> allListings = new java.util.ArrayList<>();
 
 
     //=============================================================================================================
@@ -34,7 +36,21 @@ public class MainController implements Initializable
     public void initialize(URL url, ResourceBundle resourceBundle)
     {
         System.out.println("Menu + " + UserSession.getSession().getUserCart().getItems().size());
-        welcomeText.setText("Welcome to MarketPlace "+UserSession.getSession().getActiveUser().getAccountName());
+
+        filter.getItems().clear();
+
+        MenuItem all = new MenuItem("All");
+        all.setOnAction(e -> listingHolder.getItems().setAll(allListings));
+        filter.getItems().add(all);
+
+        for (Category category : new CategoryDAO().pullCategories())
+        {
+            MenuItem item = new MenuItem(category.getName());
+
+            item.setOnAction(e -> filterByCategory(category.getId()));
+
+            filter.getItems().add(item);
+        }
 
         listingHolder.setCellFactory(lv -> new ListCell<>() {
 
@@ -127,7 +143,6 @@ public class MainController implements Initializable
     {
         if (!UserSession.getSession().getUserCart().getItems().isEmpty())
             SceneManager.switchTo(SceneID.CheckoutScreen);
-        else cartText.setVisible(true);
     }
     //=============================================================================================================
     @FXML
@@ -139,6 +154,16 @@ public class MainController implements Initializable
     public void pullActiveListings()
     {
         listingHolder.getItems().clear();
-        listingHolder.getItems().addAll(new ListingDAO().getAllActiveListings());
+        allListings = new ListingDAO().getAllActiveListings();
+        listingHolder.getItems().setAll(allListings);
+    }
+    //=============================================================================================================
+    private void filterByCategory(int categoryId)
+    {
+        listingHolder.getItems().setAll(
+                allListings.stream()
+                        .filter(listing -> listing.getCategory().getId() == categoryId)
+                        .toList()
+        );
     }
 }

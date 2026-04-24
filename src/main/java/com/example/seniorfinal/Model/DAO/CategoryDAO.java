@@ -31,7 +31,7 @@ public class CategoryDAO
                 int id = resultSet.getInt(1);
                 String name = resultSet.getString(2);
 
-                categories.add(new Category(id,name));
+                categories.add(new Category(id));
             }
         }
         catch (Exception e)
@@ -41,4 +41,25 @@ public class CategoryDAO
 
         return categories;
     }
+    //=============================================================================================================
+    public int getCategory(int listingID)
+    {
+        sqlCode = "SELECT category_id FROM listing_category  WHERE listing_id = ? LIMIT 1";
+        int categoryID = -1;
+        try(Connection connection = JDBC.getConnection())
+        {
+            statement = connection.prepareStatement(sqlCode);
+            statement.setInt(1,listingID);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next())
+                categoryID = resultSet.getInt("category_id");
+        }
+        catch (Exception e)
+        {
+
+        }
+        return categoryID;
+    }
 }
+

@@ -2,7 +2,6 @@ package com.example.seniorfinal.Core;
 
 import java.sql.Blob;
 import java.sql.Date;
-import java.util.List;
 
 public class Listing implements ListViewItem
 {
@@ -20,8 +19,9 @@ public class Listing implements ListViewItem
     private double latitude;
     private int quantity;
     private Blob listing_image;
+    private Category category;
 
-    public Listing(int id, String name, String description, boolean active, Date startTime, Date endTime, int price, int ownerID, String town, String state, double longitude, double latitude, int quantity, Blob listing_image)
+    public Listing(int id, String name, String description, boolean active, Date startTime, Date endTime, int price, int ownerID, String town, String state, double longitude, double latitude, int quantity, Blob listing_image, Category category)
     {
         this.id = id;
         this.name=name;
@@ -37,6 +37,7 @@ public class Listing implements ListViewItem
         this.latitude = latitude;
         this.quantity = quantity;
         this.listing_image = listing_image;
+        this.category = category;
     }
     public Listing(){}
 
@@ -125,4 +126,13 @@ public class Listing implements ListViewItem
         quantity = i;
     }
 
+    public Category getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(Category category)
+    {
+        this.category = category;
+    }
 }
