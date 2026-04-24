@@ -17,7 +17,7 @@
 }
 
 /* TextFields & TextAreas */
-.text-field, .text-area, .combo-box, .date-picker {
+.text-field, .text-area, .combo-box, .date-picker,.text-flow {
     -fx-background-color: #f7fbff;
     -fx-border-color: #b3d1ff;
     -fx-border-radius: 6;
@@ -64,7 +64,6 @@
 .list-cell-custom .label {
     -fx-font-size: 14px;
 }
-
 /* Remove border and background from all scroll panes */
 .scroll-pane {
     -fx-background-color: transparent;  /* remove background */

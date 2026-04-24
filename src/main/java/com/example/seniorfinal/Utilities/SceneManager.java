@@ -30,13 +30,13 @@ public class SceneManager
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/login.fxml"), loginResX, loginResY);
                     scene.getStylesheets().add(SceneManager.class
                             .getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm());
-                    stage.setTitle("Login");
+                    stage.setTitle("MarketPlace Login");
                 }
                 case CreateAccountScreen -> {
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/createAccount.fxml"), resX/2, resY/2);
                     scene.getStylesheets().add(SceneManager.class
                             .getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm());
-                    stage.setTitle("Account Creation");
+                    stage.setTitle("MarketPlace Account Creation");
                 }
                 case MainScreen -> {
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/main.fxml"), resX, resY);
@@ -53,13 +53,13 @@ public class SceneManager
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/listingCreate.fxml"), resX, resY);
                 scene.getStylesheets().add(SceneManager.class
                         .getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm());
-                    stage.setTitle("MarketPlace Listing");
+                    stage.setTitle("MarketPlace Create A Listing");
                 }
                 case ProfileScreen -> {
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/profile.fxml"), resX, resY);
                     scene.getStylesheets().add(SceneManager.class
                             .getResource("/com/example/seniorfinal/View/css/mainTheme.css").toExternalForm());
-                    stage.setTitle("MarketPlace User");
+                    stage.setTitle("MarketPlace Profile");
                 }
                 case OrderHistoryScreen -> {
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/orderHistory.fxml"), resX, resY);
@@ -83,13 +83,13 @@ public class SceneManager
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/adminView.fxml"), resX, resY);
                     scene.getStylesheets().add(SceneManager.class
                             .getResource("/com/example/seniorfinal/View/css/adminTheme.css").toExternalForm());
-                    stage.setTitle("Admin View");
+                    stage.setTitle("MarketPlace Admin View");
                 }
                 case AdminLogin -> {
                     scene = new Scene(loadFXML("/com/example/seniorfinal/View/fxml/adminLogin.fxml"), loginResX, loginResY);
                     scene.getStylesheets().add(SceneManager.class
                             .getResource("/com/example/seniorfinal/View/css/adminTheme.css").toExternalForm());
-                    stage.setTitle("Admin Login Screen");
+                    stage.setTitle("MarketPlace Admin Login Screen");
                 }
             }
 
