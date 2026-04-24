@@ -1,5 +1,6 @@
 package com.example.seniorfinal.Controllers;
 
+import com.example.seniorfinal.Core.Cart;
 import com.example.seniorfinal.Core.CartItem;
 import com.example.seniorfinal.Core.PurchaseResult;
 import com.example.seniorfinal.Core.UserSession;
@@ -30,6 +31,10 @@ public class CheckoutController implements Initializable
     private ListView<CartItem> cartListView;
     @FXML
     private Text errorText;
+    @FXML
+    private Text cartText;
+    private boolean transactionError =false;
+
 
     String sqlCode;
     //=============================================================================================================
@@ -47,37 +52,42 @@ public class CheckoutController implements Initializable
 
     //=============================================================================================================
     @FXML
-    public void purchase() throws SQLException
+    public void purchase() throws SQLException, StripeException
     {
-        PurchaseResult result = new ListingDAO().purchaseCart(UserSession.getSession().getUserCart());
-        int totalBefore = result.getTotalCharge();
+        Cart tempCart = UserSession.getSession().getUserCart();
+        System.out.println(tempCart);
+        int prevCartSize = tempCart.getItems().size();
+        PurchaseResult result = new ListingDAO().purchaseCart(tempCart);
 
         if (!result.getFailedMessages().isEmpty())
         {
+            System.out.println(prevCartSize);
+            UserSession.getSession().getUserCart().updateCart();
+            System.out.println(tempCart.getItems().size() - prevCartSize);
+            if (prevCartSize - tempCart.getItems().size()  > 0)
+                cartText.setVisible(true);
+
+
             errorText.setVisible(true);
             errorText.setText(String.join("\n", result.getFailedMessages()));
             loadCart();
+            transactionError = true;
         }
+        else transactionError = false;
         try
         {
-            int chargeAmountInt = 0;
-            if (totalBefore-result.getTotalCharge() == 0)
-                chargeAmountInt = totalBefore;
-            else
-                chargeAmountInt = totalBefore-result.getTotalCharge();
+            int chargeAmountInt = result.getTotalCharge();
             Long chargeAmountLong = chargeAmountInt *100L;
             PaymentIntent paymentIntent = StripePayment.createPaymentIntent(chargeAmountLong, "usd");
             String clientSecret = paymentIntent.getClientSecret();
 
             System.out.println("Client Secret: " + clientSecret + ", total: $" + chargeAmountInt);
         }
-        catch (ListingNotFoundException | ListingInactiveException | InsufficientQuantityException | StripeException e)
+        catch (StripeException e)
         {
-            errorText.setVisible(true);
-            errorText.setText(e.getMessage());
-            loadCart();
+            System.out.println(e);
         }
-        if (UserSession.getSession().getUserCart().getItems().isEmpty())
+        if (UserSession.getSession().getUserCart().getItems().isEmpty() && !transactionError)
             SceneManager.switchTo(SceneID.MainScreen);
     }
     //=============================================================================================================

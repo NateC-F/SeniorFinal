@@ -24,6 +24,8 @@ public class MainController implements Initializable
     @FXML
     private Text welcomeText;
     @FXML
+    private Text cartText;
+    @FXML
     ListView<Listing> listingHolder;
 
 
@@ -123,7 +125,9 @@ public class MainController implements Initializable
     //=============================================================================================================
     public void openCheckOut()
     {
-        SceneManager.switchTo(SceneID.CheckoutScreen);
+        if (!UserSession.getSession().getUserCart().getItems().isEmpty())
+            SceneManager.switchTo(SceneID.CheckoutScreen);
+        else cartText.setVisible(true);
     }
     //=============================================================================================================
     @FXML

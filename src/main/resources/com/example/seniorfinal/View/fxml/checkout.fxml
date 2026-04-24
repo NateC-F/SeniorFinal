@@ -3,14 +3,20 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.seniorfinal.Controllers.CheckoutController">
    <children>
-      <Button layoutX="437.0" layoutY="204.0" onAction="#goBack" text="Cancel" />
-      <Button layoutX="83.0" layoutY="204.0" onAction="#purchase" text="Buy" />
-      <Text fx:id="totalPrice" layoutX="83.0" layoutY="291.0" text="Total: $" />
-      <ListView fx:id="cartListView" layoutX="600.0" layoutY="100.0" prefHeight="400.0" prefWidth="500.0" />
-      <Text fx:id="errorText" fill="RED" layoutX="83.0" layoutY="313.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" />
+      <Button layoutX="86.0" layoutY="546.0" onAction="#goBack" text="Cancel" />
+      <Button layoutX="14.0" layoutY="546.0" onAction="#purchase" text="Buy" />
+      <Text fx:id="totalPrice" layoutX="14.0" layoutY="590.0" text="Total: $" />
+      <ListView fx:id="cartListView" layoutX="14.0" layoutY="65.0" prefHeight="468.0" prefWidth="696.0" />
+      <Text fx:id="errorText" fill="RED" layoutX="14.0" layoutY="612.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" />
+      <Text fx:id="cartText" layoutX="14.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="An Item Has Been Removed From Your Cart As It Is No Longer Available" visible="false">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>

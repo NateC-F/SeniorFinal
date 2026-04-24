@@ -40,6 +40,14 @@
                   <Font size="14.0" />
                </font>
             </Button>
+            <Text fx:id="cartText" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="Cannot Enter Check Out, Add Items To Cart" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="5.0" top="5.0" />
+               </HBox.margin>
+            </Text>
          </children>
       </HBox>
       <Text fx:id="welcomeText" layoutX="14.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />

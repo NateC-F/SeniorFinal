@@ -2,6 +2,7 @@ package com.example.seniorfinal.Model.DAO;
 
 import com.example.seniorfinal.Core.*;
 import com.example.seniorfinal.Utilities.*;
+import com.stripe.exception.StripeException;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -190,7 +191,7 @@ public class ListingDAO
         }
     }
     //=============================================================================================================
-    public PurchaseResult purchaseCart(Cart cart) throws SQLException
+    public PurchaseResult purchaseCart(Cart cart) throws SQLException, StripeException
     {
         // IN listing_input_id INT,
         // IN listing_buyer_id INT,
@@ -295,6 +296,25 @@ public class ListingDAO
             System.out.println(e);
         }
         return orderHistory;
+    }
+    //=============================================================================================================
+    public int getListingQuantity(int listingID)
+    {
+        sqlCode = "SELECT listing_quantity FROM listing WHERE listing_id = ?";
+
+        try(Connection connection = JDBC.getConnection())
+        {
+            PreparedStatement statement = connection.prepareStatement(sqlCode);
+            statement.setInt(1,listingID);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+        return -1;
     }
     //=============================================================================================================
 }

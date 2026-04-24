@@ -1,5 +1,7 @@
 package com.example.seniorfinal.Core;
 
+import com.example.seniorfinal.Model.DAO.ListingDAO;
+
 import java.util.ArrayList;
 
 public class Cart
@@ -10,7 +12,7 @@ public class Cart
     {
         listings = new ArrayList<>();
     }
-
+    //=============================================================================================================
     public int getCartTotal()
     {
         int runningTotal=0;
@@ -21,17 +23,37 @@ public class Cart
         }
         return runningTotal;
     }
-
+    //=============================================================================================================
     public void addToCart(CartItem item)
     {
         listings.add(item);
         System.out.println("Item Added");
-    }
+    }//=============================================================================================================
     public void removeFromCart(CartItem item)
     {
         listings.remove(item);
         System.out.println("Item removed");
+    }//=============================================================================================================
+    public void updateCart()
+    {
+        ArrayList<CartItem> tempList = new ArrayList<>(listings);
+        ArrayList<CartItem> toRemove = new ArrayList<>();
+
+        for (CartItem listing : tempList)
+        {
+            listing.setMaxQuantity(new ListingDAO().getListingQuantity(listing.getListing().getId()));
+
+            if (listing.getMaxQuantity() == 0)
+                toRemove.add(listing);
+            else
+                listing.setQuantity(listing.getMaxQuantity());
+        }
+
+        for (CartItem item : toRemove) {
+            listings.remove(item);
+        }
     }
+    //=============================================================================================================
 
     public ArrayList<CartItem> getItems()
     {
