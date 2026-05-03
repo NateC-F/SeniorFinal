@@ -2,7 +2,7 @@ package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.Category;
 import com.example.seniorfinal.Core.Listing;
-import com.example.seniorfinal.Core.ImageBlob;
+import com.example.seniorfinal.Utilities.ImageBlob;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Model.DAO.CategoryDAO;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
@@ -16,7 +16,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import java.net.URL;
 import java.util.ResourceBundle;

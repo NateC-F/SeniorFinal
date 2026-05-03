@@ -1,4 +1,4 @@
-package com.example.seniorfinal.Core;
+package com.example.seniorfinal.Utilities;
 
 import javafx.scene.image.Image;
 
@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.SQLException;
 

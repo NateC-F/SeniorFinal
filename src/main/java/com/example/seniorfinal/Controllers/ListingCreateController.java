@@ -1,7 +1,7 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.Category;
-import com.example.seniorfinal.Core.ImageBlob;
+import com.example.seniorfinal.Utilities.ImageBlob;
 import com.example.seniorfinal.Core.Location;
 import com.example.seniorfinal.Model.DAO.CategoryDAO;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
@@ -18,16 +18,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.sql.Blob;
 import java.sql.Date;
 import java.sql.SQLException;

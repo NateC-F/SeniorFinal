@@ -1,5 +1,6 @@
-package com.example.seniorfinal.Core;
+package com.example.seniorfinal.Utilities;
 
+import com.example.seniorfinal.Core.ListingReceipt;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

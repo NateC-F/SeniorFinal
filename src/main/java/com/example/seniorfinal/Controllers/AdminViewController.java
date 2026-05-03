@@ -3,7 +3,7 @@ package com.example.seniorfinal.Controllers;
 import com.example.seniorfinal.Core.*;
 import com.example.seniorfinal.Model.DAO.AccountDAO;
 import com.example.seniorfinal.Model.DAO.ListingDAO;
-import javafx.beans.binding.ObjectExpression;
+import com.example.seniorfinal.Utilities.ImageBlob;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -14,12 +14,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import javax.swing.table.TableColumn;
-import javax.swing.text.TableView;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class AdminViewController implements Initializable

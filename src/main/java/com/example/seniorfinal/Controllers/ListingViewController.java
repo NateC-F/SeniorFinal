@@ -1,7 +1,7 @@
 package com.example.seniorfinal.Controllers;
 
 import com.example.seniorfinal.Core.CartItem;
-import com.example.seniorfinal.Core.ImageBlob;
+import com.example.seniorfinal.Utilities.ImageBlob;
 import com.example.seniorfinal.Core.Listing;
 import com.example.seniorfinal.Core.UserSession;
 import com.example.seniorfinal.Utilities.SceneID;

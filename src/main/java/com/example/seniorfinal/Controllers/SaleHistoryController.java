@@ -1,6 +1,6 @@
 package com.example.seniorfinal.Controllers;
 
-import com.example.seniorfinal.Core.InvoiceCreator;
+import com.example.seniorfinal.Utilities.InvoiceCreator;
 import com.example.seniorfinal.Core.ListingReceipt;
 import com.example.seniorfinal.Core.UserSession;
 import javafx.collections.FXCollections;
